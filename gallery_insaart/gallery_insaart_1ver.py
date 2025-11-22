@@ -35,16 +35,19 @@ def crawl_exhibitions():
             section = section_loc.inner_text().strip() if section_loc.count() else ""   # if 조건이 참이면 즉, section_loc.count()가 있으면 '.inner_text()'로 태그 안에 있는 텍스트를 가져옴 '.strip()'으로 텍스트 앞뒤의 불필요한 공백이나 줄바꿈 제거해서 section에 넣음
 
             # h4 아래 p[1], p[2], p[3]를 부제 / 기간 / 장소로 사용
+            subtitle_loc = h4.locator("xpath=following-sibling::p[1]")      # 전시 부제
             date_loc     = h4.locator("xpath=following-sibling::p[2]")      # 전시 기간
 
+            subtitle = subtitle_loc.inner_text().strip() if subtitle_loc.count() else ""
             date_text = date_loc.inner_text().strip() if date_loc.count() else ""
 
             exhibitions.append(
                 {
-                    "address": section,        # 본 전시장 (1F) 등
-                    "title": title_kr,      # 전시 제목
-                    "operatingDay": date_text,         # 기간
-                    "operatingHour": "AM 10:00 ~ PM 19:00"
+                    "section": section,        # 본 전시장 (1F) 등
+                    "title_kr": title_kr,      # 전시 제목
+                    "subtitle": subtitle,      # 부제
+                    "date": date_text,         # 기간
+                    "detail_url": detail_url,  # 상세페이지 링크
                 }
             )
 
