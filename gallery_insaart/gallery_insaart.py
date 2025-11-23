@@ -16,6 +16,7 @@ def crawl_exhibitions():
         page.wait_for_timeout(3000)                 # 3초 정도 기다려서 로딩 여유
 
         exhibitions = []                            # 전시 정보를 담을 리스트
+        detail_urls = []
 
         # ▶ 전시 제목(h4 안의 a) 기준으로 목록 수집
         h4_links = page.locator("h4 a")             # 전시 제목에 해당하는 링크들이 h4 안에 <a>로 들어있다고 가정하고 그것들만 모음
@@ -44,16 +45,19 @@ def crawl_exhibitions():
                     "address": section,        # 본 전시장 (1F) 등
                     "title": title_kr,      # 전시 제목
                     "operatingDay": date_text,         # 기간
-                    "operatingHour": "AM 10:00 ~ PM 19:00"
+                    "operatingHour": "AM 10:00 ~ PM 19:00",
+                    "galleryName": "갤러리인사아트"
                 }
             )
+
+            detail_urls.append(detail_url)
 
         print(f"[리스트] 수집된 전시 수: {len(exhibitions)}")
 
         # 2) exhibitions에 쌓아둔 각 전시별 detail_url로 들어가서 상세 페이지를 열고 3초동안 대기
-        for ex in exhibitions:
-            url = ex["detail_url"]
-            print(f"\n[상세] 이동: {ex['title_kr']} -> {url}")
+        for i, ex in enumerate(exhibitions):
+            url = detail_urls[i]
+            print(f"\n[상세] 이동: {ex['title']} -> {url}")
             page.goto(url, timeout=60_000)
             page.wait_for_timeout(3000)
 
@@ -88,7 +92,7 @@ def crawl_exhibitions():
                     continue
 
                 # 지정하신 경로가 포함된 이미지들만 수집
-                if "https://galleryinsaart.com/wp-content/uploads/2025/" not in src:        # 추출된 이미지 url에 특정 경로가 포함되지 않으면 images_url에 담지 않음
+                if "wp-content/uploads/2025/" not in src:        # 추출된 이미지 url에 특정 경로가 포함되지 않으면 images_url에 담지 않음
                     continue
 
                 image_urls.append(src)
@@ -96,7 +100,7 @@ def crawl_exhibitions():
             # 수집된 정보를 exhibition dict 에 상세정보 추가
             ex["artist"] = artist
             ex["description"] = description
-            ex["images"] = image_urls
+            ex["imageUrl"] = image_urls
 
             print(f"[상세] 이미지 개수: {len(image_urls)}")
 
@@ -117,18 +121,5 @@ if __name__ == "__main__":
         print(f"\n JSON 저장 완료: {output_path}")
         print(f"전시 개수: {len(data)}")
 
-    for ex in data:
-        print("\n==================== 전시 ====================")
-        print("전시장(섹션):", ex["section"])
-        print("리스트 제목:", ex["title_kr"])
-        print("부제:", ex["subtitle"])
-        print("기간(리스트):", ex["date"])
-        print("작가:", ex.get("artist", ""))
-
-        print("\n[설명 텍스트]")
-        desc = ex.get("description", "")
-        print(desc[:500], "..." if len(desc) > 500 else "")
-
-        print("\n[이미지 URL들]")
-        for img in ex.get("images", []):
-            print(" -", img)
+    print("=========json저장 완료=========")
+        

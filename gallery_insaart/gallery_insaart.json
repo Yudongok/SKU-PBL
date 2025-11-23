@@ -1,13 +1,14 @@
 [
   {
-    "section": "본 전시장 (1F)",
-    "title_kr": "노진숙 개인전",
-    "subtitle": "엄마를 그리는 판타지",
-    "date": "2025 11/19 - 11/24",
-    "detail_url": "https://galleryinsaart.com/exhibition/%eb%85%b8%ec%a7%84%ec%88%99-%ea%b0%9c%ec%9d%b8%ec%a0%84/",
+    "address": "본 전시장 (1F)",
+    "title": "노진숙 개인전",
+    "operatingDay": "2025 11/19 - 11/24",
+    "operatingHour": "AM 10:00 ~ PM 19:00",
+    "galleryName": "갤러리인사아트",
     "artist": "노진숙",
     "description": "",
-    "images": [
+    "imageUrl": [
+      "https://www.galleryinsaart.com/wp-content/uploads/2025/11/1슬-2.jpg",
       "https://galleryinsaart.com/wp-content/uploads/2025/11/1-1-2-300x260.jpg",
       "https://galleryinsaart.com/wp-content/uploads/2025/11/1-2-1-160x300.jpg",
       "https://galleryinsaart.com/wp-content/uploads/2025/11/1-5-1-300x220.jpg",
@@ -17,14 +18,15 @@
     ]
   },
   {
-    "section": "특별 전시장 (B1)",
-    "title_kr": "노진숙 개인전",
-    "subtitle": "엄마를 그리는 판타지",
-    "date": "2025 11/19 - 11/24",
-    "detail_url": "https://galleryinsaart.com/exhibition/%eb%85%b8%ec%a7%84%ec%88%99-%ea%b0%9c%ec%9d%b8%ec%a0%84/",
+    "address": "특별 전시장 (B1)",
+    "title": "노진숙 개인전",
+    "operatingDay": "2025 11/19 - 11/24",
+    "operatingHour": "AM 10:00 ~ PM 19:00",
+    "galleryName": "갤러리인사아트",
     "artist": "노진숙",
     "description": "",
-    "images": [
+    "imageUrl": [
+      "https://www.galleryinsaart.com/wp-content/uploads/2025/11/1슬-2.jpg",
       "https://galleryinsaart.com/wp-content/uploads/2025/11/1-1-2-300x260.jpg",
       "https://galleryinsaart.com/wp-content/uploads/2025/11/1-2-1-160x300.jpg",
       "https://galleryinsaart.com/wp-content/uploads/2025/11/1-5-1-300x220.jpg",
@@ -34,25 +36,28 @@
     ]
   },
   {
-    "section": "2 전시장 (2F)",
-    "title_kr": "가톨릭사진연구회 제 16회 정기회원전",
-    "subtitle": "빛이 있으라 하시니",
-    "date": "2025 11/19 - 11/24",
-    "detail_url": "https://galleryinsaart.com/exhibition/%ea%b0%80%ed%86%a8%eb%a6%ad%ec%82%ac%ec%a7%84%ec%97%b0%ea%b5%ac%ed%9a%8c-%ec%a0%9c-16%ed%9a%8c-%ec%a0%95%ea%b8%b0%ed%9a%8c%ec%9b%90%ec%a0%84/",
+    "address": "2 전시장 (2F)",
+    "title": "가톨릭사진연구회 제 16회 정기회원전",
+    "operatingDay": "2025 11/19 - 11/24",
+    "operatingHour": "AM 10:00 ~ PM 19:00",
+    "galleryName": "갤러리인사아트",
     "artist": "가톨릭사진연구회",
     "description": "빛은 세상의 모든 것을 창조하고 변화시키는 근원이다. 빛이 없으면 세상은 어둠 속에 갇히고, 생명체들은 살아갈 수 없다. 빛이 없으면 사진도 존재하지 못하기에 사진을 ‘빛으로 그린 그림’이라고도 한다.\n이번 가톨릭사진연구회의 제16회 전시회에서는 매년 진행되고 있는 ‘빛이 있으라 하시니’라는 주제를 빛과 그림자, 인간들의 사랑과 삶의 모습, 풍성한 자연현상, 생명체들의 강인한 소생하는 모습들로 보여주고자 하였다.\n빛과 그림자는 서로 대립하면서도 조화를 이루는 존재다. 빛이 있으면 그림자가 생기고, 그림자가 없으면 빛이 존재하지 않는다. 이는 인간의 삶에서도 마찬가지다. 남녀간의 사랑, 자식에 대한 내리사랑, 다양한 갈등 상황 등도 우리가 언제나 빛과 그림자를 함께 안고 살아가는 모습들이다.\n우리는 자연현상의 빛과 그림자의 조화로운 모습을 보며 자연의 아름다움과 신비로움을 느끼고 감탄한다. 생명체들은 언제나 빛을 향해 나아가고, 빛을 통해 새로운 생명을 얻습니다. 생명체들의 강한 삶의 욕구를  사진으로 담으며 사랑과 갈등, 삶의 강렬한 의지를 배우며 사진으로 남기고자 노력한 결과물이 이번 전시회다.\n이번 전시회를 통해 빛과 그림자, 사랑, 인간 삶의 모습, 자연현상, 생명체들의 강인한 소생하는 모습들을 감상하고, 빛의 아름다움과 소중함을 느껴보길 바란다.",
-    "images": [
+    "imageUrl": [
+      "https://www.galleryinsaart.com/wp-content/uploads/2025/11/2슬-3.jpg",
       "https://galleryinsaart.com/wp-content/uploads/2025/11/2층-작품-300x120.jpg"
     ]
   },
   {
-    "section": "3 전시장 (3F)",
-    "title_kr": "최경자 개인전",
-    "subtitle": "기억하는 풍경",
-    "date": "2025 11/19 - 11/24",
-    "detail_url": "https://galleryinsaart.com/exhibition/%ec%b5%9c%ea%b2%bd%ec%9e%90-%ea%b0%9c%ec%9d%b8%ec%a0%84/",
+    "address": "3 전시장 (3F)",
+    "title": "최경자 개인전",
+    "operatingDay": "2025 11/19 - 11/24",
+    "operatingHour": "AM 10:00 ~ PM 19:00",
+    "galleryName": "갤러리인사아트",
     "artist": "최경자",
     "description": "",
-    "images": []
+    "imageUrl": [
+      "https://www.galleryinsaart.com/wp-content/uploads/2025/11/3슬-1.jpg"
+    ]
   }
 ]

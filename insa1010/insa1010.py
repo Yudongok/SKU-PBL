@@ -90,6 +90,7 @@ def extract_fields_with_gpt(description_text: str, image_urls: list[str]) -> dic
     data.setdefault("imageUrl", image_urls[0] if image_urls else "")
     data.setdefault("operatingHour", "")
     data.setdefault("operatingDay", "")
+    data.setdefault("galleryName", "")
 
     return data
 
@@ -176,10 +177,10 @@ def crawl_exhibitions():
             ex.update({
                 "title": gpt_data["title"],
                 "description": gpt_data["description"],
-                "imageUrl": gpt_data["imageUrl"],
+                "imageUrl": image_urls,  # 전체 이미지 리스트도 같이 저장
                 "operatingHour": gpt_data["operatingHour"],
                 "operatingDay": gpt_data["operatingDay"],
-                "images": image_urls,  # 전체 이미지 리스트도 같이 저장
+                "galleryName": "인사1010",
             })
 
             print(f"[상세] 제목: {ex['title']}")
