@@ -2,9 +2,128 @@ from urllib.parse import urljoin
 # Playwright의 동기(Sync)버전 API를 쓰기 위한 것
 from playwright.sync_api import sync_playwright
 import json
+import re
+from datetime import datetime
 
 # 갤러리 인사아트의 현재 전시 url
 LIST_URL = "https://galleryinsaart.com/exhibitions-current/"
+
+
+# ==============================
+# 날짜/시간 파싱 유틸 함수들
+# ==============================
+
+def parse_single_date(part: str, base_date: datetime | None = None) -> datetime | None:
+    """
+    part: '2025.12.3', '2025. 12. 03', '12.8', '8' 같은 문자열
+    base_date: 연/월이 생략된 경우 참고할 기준 날짜
+    """
+    if not part:
+        return None
+
+    # 앞뒤 공백 제거
+    s = part.strip()
+    # "2025. 12. 03" -> "2025.12.03" (점 주변 공백 제거)
+    s = re.sub(r"\s*\.\s*", ".", s)
+
+    # 1) YYYY.MM.DD 형식
+    m = re.match(r"^(\d{4})\.(\d{1,2})\.(\d{1,2})$", s)
+    if m:
+        y, mth, d = map(int, m.groups())
+        try:
+            return datetime(year=y, month=mth, day=d)
+        except ValueError:
+            return None
+
+    # 2) MM.DD 형식 (연도는 base_date에서 가져오기)
+    if base_date:
+        m = re.match(r"^(\d{1,2})\.(\d{1,2})$", s)
+        if m:
+            mth, d = map(int, m.groups())
+            try:
+                return datetime(year=base_date.year, month=mth, day=d)
+            except ValueError:
+                return None
+
+    # 3) DD 형식 (연/월은 base_date에서 가져오기)
+    if base_date:
+        m = re.match(r"^(\d{1,2})$", s)
+        if m:
+            d = int(m.group(1))
+            try:
+                return datetime(year=base_date.year, month=base_date.month, day=d)
+            except ValueError:
+                return None
+
+    # 다 안 맞으면 실패
+    return None
+
+
+def parse_operating_day(operating_day: str):
+    """
+    예시:
+      '2025. 11. 26 - 2025. 12. 15'  -> ('2025-11-26', '2025-12-15')
+      '2025.12.3-12.8'               -> ('2025-12-03', '2025-12-08')
+      '2025.12.3 ~ 12.8'             -> ('2025-12-03', '2025-12-08')
+      '2025.12.3 ~ 2025.12.8'        -> ('2025-12-03', '2025-12-08')
+    실패 시: (원본 문자열, "")
+    """
+    if not operating_day:
+        return "", ""
+
+    text = operating_day.strip()
+
+    # ~, -, –(엔대시) 기준으로 앞/뒤 나누기 (한 번만 split)
+    parts = re.split(r"\s*[-~–]\s*", text, maxsplit=1)
+    if len(parts) != 2:
+        # 형식 이상하면 그냥 통째로 start_date에 넣고 end_date는 빈 값
+        return text, ""
+
+    start_part, end_part = parts[0], parts[1]
+
+    # 앞 날짜 먼저 파싱
+    start_dt = parse_single_date(start_part)
+    if not start_dt:
+        # 시작 날짜도 못 읽으면 그냥 통째로 start_date
+        return text, ""
+
+    # 뒤 날짜는 연/월이 없으면 앞 날짜 기준으로 보완
+    end_dt = parse_single_date(end_part, base_date=start_dt)
+    if not end_dt:
+        # 끝 날짜 못 읽으면 시작만 반환
+        return start_dt.strftime("%Y-%m-%d"), ""
+
+    return start_dt.strftime("%Y-%m-%d"), end_dt.strftime("%Y-%m-%d")
+
+
+def parse_operating_hour(operating_hour: str):
+    """
+    예시:
+      'AM 10:00 ~ PM 19:00'
+      '10:00 ~ 18:00'
+      '10:00-18:00'
+      '10:00 – 18:00(월요일 휴관)'
+    -> ('AM 10:00', 'PM 19:00') 또는 ('10:00', '18:00')
+    """
+    if not operating_hour:
+        return "", ""
+
+    # 괄호 뒤 설명 제거
+    base = operating_hour.split("(", 1)[0].strip()
+    # ~, -, – 기준으로 쪼개기
+    parts = re.split(r"\s*[-~–]\s*", base)
+    if len(parts) != 2:
+        # 쪼개기 실패하면 전체를 open_time으로만 사용
+        return base, ""
+
+    open_time = parts[0].strip()
+    close_time = parts[1].strip()
+    return open_time, close_time
+
+
+# ==============================
+# 크롤러 본체
+# ==============================
 
 def crawl_exhibitions():
     with sync_playwright() as p:                    # sync_playwright(): 동기(Sync)방식으로 Playwright를 실행
@@ -30,22 +149,31 @@ def crawl_exhibitions():
             detail_url = urljoin(LIST_URL, href)           # 목록 페이지 기준으로 상세 페이지의 절대 URL 조인해서 만들기
 
             # 이 전시가 속한 전시장(h3)을 바로 위에서 찾기
-            # locator()는 웹 페이지 내의 특정 요소(Element)를 찾기 위한 지정자(Pointer)를 만드느 함수이다. 단순히 페이지 전체에서 찾는 것이 아니라, 이미 찾은 링크를 기준으로 상대적인 위치를 찾는 역할을 하고있다.
             h4 = link.locator("xpath=ancestor::h4[1]")                                  # a태그를 감싸고 있는 바로 위의 h4요소
             section_loc = h4.locator("xpath=preceding::h3[1]")                          # h4 위쪽에 있는 가장 가까운 h3 하나 -> h3가 전시장 이름 역할
-            section = section_loc.inner_text().strip() if section_loc.count() else ""   # if 조건이 참이면 즉, section_loc.count()가 있으면 '.inner_text()'로 태그 안에 있는 텍스트를 가져옴 '.strip()'으로 텍스트 앞뒤의 불필요한 공백이나 줄바꿈 제거해서 section에 넣음
+            section = section_loc.inner_text().strip() if section_loc.count() else ""   # 전시장 이름
 
-            # h4 아래 p[1], p[2], p[3]를 부제 / 기간 / 장소로 사용
-            date_loc     = h4.locator("xpath=following-sibling::p[2]")      # 전시 기간
-
+            # h4 아래 p[2]를 기간으로 사용
+            date_loc = h4.locator("xpath=following-sibling::p[2]")      # 전시 기간
             date_text = date_loc.inner_text().strip() if date_loc.count() else ""
+
+            # 운영 시간 텍스트
+            operating_hour = "AM 10:00 ~ PM 19:00"
+
+            # 날짜/시간 파싱
+            start_date, end_date = parse_operating_day(date_text)
+            open_time, close_time = parse_operating_hour(operating_hour)
 
             exhibitions.append(
                 {
-                    "address": section,        # 본 전시장 (1F) 등
-                    "title": title_kr,      # 전시 제목
-                    "operatingDay": date_text,         # 기간
-                    "operatingHour": "AM 10:00 ~ PM 19:00",
+                    "address": section,             # 본 전시장 (1F) 등
+                    "title": title_kr,              # 전시 제목
+                    "operatingDay": date_text,      # 기간 (raw)
+                    "operatingHour": operating_hour,  # 운영시간 (raw)
+                    "start_date": start_date,       # 파싱된 시작일
+                    "end_date": end_date,           # 파싱된 종료일
+                    "open_time": open_time,         # 파싱된 오픈 시간
+                    "close_time": close_time,       # 파싱된 마감 시간
                     "galleryName": "갤러리인사아트"
                 }
             )
@@ -66,7 +194,7 @@ def crawl_exhibitions():
 
             h5s = page.locator("h5, h6")   # 작가 정보가 <h5>, <h6> 태그에 있을 것으로 가정하고 locator를 설정해서 모두 찾음
             h5_count = h5s.count()
-            if h5_count >= 1:              # 찾은 요수 개수가 1개 이상일 경우, 첫 번째 요소의 텍스트를 작가로 간주하여 추출
+            if h5_count >= 1:              # 찾은 요소 개수가 1개 이상일 경우, 첫 번째 요소의 텍스트를 작가로 간주하여 추출
                 artist = h5s.nth(0).inner_text().strip()
 
             # (3) 설명 텍스트: div.fusion-text.fusion-text-2 안의 텍스트만 크롤링
@@ -122,4 +250,3 @@ if __name__ == "__main__":
         print(f"전시 개수: {len(data)}")
 
     print("=========json저장 완료=========")
-        

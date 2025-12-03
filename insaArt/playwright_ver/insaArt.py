@@ -1,9 +1,114 @@
 from urllib.parse import urljoin
 from playwright.sync_api import sync_playwright
 import json
+import re
+from datetime import datetime
 
 # 인사아트센터 현재 전시 URL
 LIST_URL = "https://www.insaartcenter.com/bbs/board.php?bo_table=exhibition_current"
+
+
+def parse_single_date(part, base_date=None):
+    """
+    part: '2025. 11. 26', '2025.12.3', '12.8', '8' 같은 문자열
+    base_date: 연/월이 생략된 경우 참고할 기준 날짜 (datetime 또는 None)
+    """
+    if not part:
+        return None
+
+    # 앞뒤 공백 제거
+    s = part.strip()
+    
+    # "2025. 11. 26" -> "2025.11.26" 처럼 점 주변 공백 제거
+    s = re.sub(r"\s*\.\s*", ".", s)
+
+    # 1) YYYY.MM.DD 형식
+    m = re.match(r"^(\d{4})\.(\d{1,2})\.(\d{1,2})$", s)
+    if m:
+        y, mth, d = map(int, m.groups())
+        try:
+            return datetime(year=y, month=mth, day=d)
+        except ValueError:
+            return None
+
+    # 2) MM.DD 형식 (연도는 base_date에서 가져오기)
+    if base_date:
+        m = re.match(r"^(\d{1,2})\.(\d{1,2})$", s)
+        if m:
+            mth, d = map(int, m.groups())
+            try:
+                return datetime(year=base_date.year, month=mth, day=d)
+            except ValueError:
+                return None
+
+    # 3) DD 형식 (연/월은 base_date에서 가져오기)
+    if base_date:
+        m = re.match(r"^(\d{1,2})$", s)
+        if m:
+            d = int(m.group(1))
+            try:
+                return datetime(year=base_date.year, month=base_date.month, day=d)
+            except ValueError:
+                return None
+
+    # 다 안 맞으면 실패
+    return None
+
+
+def parse_operating_day(operating_day: str):
+    """
+    예시:
+      '2025. 11. 26 - 2025. 12. 15'  -> ('2025-11-26', '2025-12-15')
+      '2025.12.3-12.8'               -> ('2025-12-03', '2025-12-08')
+      '2025.12.3 ~ 12.8'             -> ('2025-12-03', '2025-12-08')
+      '2025.12.3 ~ 2025.12.8'        -> ('2025-12-03', '2025-12-08')
+    실패 시: (원본 문자열, "")
+    """
+    if not operating_day:
+        return "", ""
+
+    text = operating_day.strip()
+
+    # ~, -, –(엔대시) 기준으로 앞/뒤 나누기 ("maxsplit=1"은 한 번만 split)
+    parts = re.split(r"\s*[-~–]\s*", text, maxsplit=1)
+    if len(parts) != 2:
+        # 형식 이상하면 그냥 통째로 start_date에 넣고 end_date는 빈 값
+        return text, ""
+
+    start_part, end_part = parts[0], parts[1]
+
+    # 앞 날짜 먼저 파싱
+    start_dt = parse_single_date(start_part)
+    if not start_dt:
+        # 시작 날짜도 못 읽으면 그냥 통째로 start_date
+        return text, ""
+
+    # 뒤 날짜는 연/월이 없으면 앞 날짜 기준으로 보완
+    end_dt = parse_single_date(end_part, base_date=start_dt)
+    if not end_dt:
+        # 끝 날짜 못 읽으면 시작만 반환
+        return start_dt.strftime("%Y-%m-%d"), ""
+
+    return start_dt.strftime("%Y-%m-%d"), end_dt.strftime("%Y-%m-%d")
+
+
+def parse_operating_hour(operating_hour: str):
+    """
+    예시: 'AM 10:00 ~ PM 19:00(화요일 정기 휴무)'
+    -> ('AM 10:00', 'PM 19:00')
+    """
+    if not operating_hour:
+        return "", ""
+
+    # 괄호 뒤 설명 제거
+    base = operating_hour.split("(", 1)[0].strip()
+    parts = [p.strip() for p in base.split("~")]
+    if len(parts) != 2:
+        return base, ""
+
+    open_time = parts[0]
+    close_time = parts[1]
+    return open_time, close_time
 
 
 def crawl_exhibitions():
@@ -37,6 +142,7 @@ def crawl_exhibitions():
 
             href = link.get_attribute("href") or ""
             detail_url = urljoin(LIST_URL, href)
+
             # (2) 기간 / 전시장 / 갤러리명
             rows = item.locator(".list-spec table tr")
             row_count = rows.count()
@@ -45,13 +151,25 @@ def crawl_exhibitions():
             hall = rows.nth(1).inner_text().strip() if row_count > 1 else ""
             gallery_txt = rows.nth(2).inner_text().strip() if row_count > 2 else ""
 
+            # operating_day → start_date / end_date
+            start_date, end_date = parse_operating_day(operating_day)
+
+            # 운영시간 고정값 → open_time / close_time 분리
+            operating_hour = "AM 10:00 ~ PM 19:00(화요일 정기 휴무)"
+            open_time, close_time = parse_operating_hour(operating_hour)
+
             exhibitions.append(
                 {
-                    "title": title_kr,                # 전시 제목
-                    "operatingDay": operating_day,    # 기간
-                    "address": hall,                  # 전시장 정보 (예: B1F 제1전시장)
+                    "title": title_kr,                    # 전시 제목
+                    "start_date": start_date,             # 시작일
+                    "end_date": end_date,                 # 종료일
+                    "address": hall,                      # 전시장 정보
                     "galleryName": gallery_txt or "인사아트센터",
-                    "operatingHour": "AM 10:00 ~ PM 19:00(화요일 정기 휴무)",
+                    "open_time": open_time,
+                    "close_time": close_time,
+                    "artist": "",
+                    "description": "",
+                    "imageUrl": [],
                 }
             )
 
@@ -66,9 +184,8 @@ def crawl_exhibitions():
             page.goto(url, timeout=60_000)
             page.wait_for_timeout(3000)
 
-            # (1) 작가 정보 (페이지 구조에 따라 수정 필요)
+            # (1) 작가 정보
             artist = ""
-            
             spec = page.locator("div.spec")
             if spec.count():
                 rows = spec.locator("table tr")
@@ -86,35 +203,25 @@ def crawl_exhibitions():
                             artist = "".join(td.inner_text().split())
                         break
 
-            # (2) 설명 텍스트: 본문(#bo_v_con 또는 .bo_v_con)을 우선 사용
-            description = ""
-
+            # (2) 설명 텍스트
             content = page.locator("#bo_v_con")
             if not content.count():
                 content = page.locator(".bo_v_con")
 
-            # p태그 있는지 여부 파악
             if content.count():
                 p_loc = content.locator("p")
                 if p_loc.count():
                     paragraphs = p_loc.all_inner_texts()
                 else:
                     paragraphs = [content.inner_text()]
-
-            # p태그도 없고 #bo_v_con, .bo_v_con도 없으면 fallback으로 페이지 전체 <p>사용
             else:
                 paragraphs = page.locator("p").all_inner_texts()
 
-            # paragraphs 리스트를 돌면서 앞에 있는 p.strip()으로 공백을 제거한다. if p.strip()은 공백만 있는 문자열은 버리고 앞뒤 공백을 제거한 문자열만 담는다는 뜻이다.
-            # 즉 if p.strip()은 내용이 있는지 확인하는 조건이다. 만약 없다면 False가 나와서 description에 저장하지 않고 넘어가게 된다.
-            # if p.strip()은 그냥 조건 체크용이기 때문에 실제로 p.strip()이 실행되어 p값을 변경하지 않는다. 따라서 마지막에 p.strip()해주는 것이다.
             description = "\n".join([p.strip() for p in paragraphs if p.strip()])
 
             # (3) 이미지 URL
-
             image_urls = []
 
-            # 슬라이더 안의 li (clone 제외하고 싶으면 :not(.clone) 사용)
             gallery_items = page.locator("#img-gallery li")
             item_count = gallery_items.count()
 
@@ -124,7 +231,7 @@ def crawl_exhibitions():
                 # 1순위: 원본 이미지 data-src
                 src = li.get_attribute("data-src")
 
-                # 혹시 data-src가 없다면, <img>의 src를 fallback으로 사용
+                # data-src가 없으면, <img>의 src 사용
                 if not src:
                     img_el = li.locator("img")
                     if img_el.count():
@@ -137,20 +244,16 @@ def crawl_exhibitions():
                 if not src:
                     continue
 
-                # 인사아트센터 전시 이미지 폴더만 필터링하고 싶을 때
+                # 인사아트센터 전시 이미지 폴더만 필터링
                 if "/data/file/exhibition_current/" not in src:
                     continue
 
                 image_urls.append(src)
 
-            # 중복 제거 (clone li 등에서 같은 이미지가 반복될 수 있으므로)
-            image_urls = list(dict.fromkeys(image_urls))  # 순서 유지하면서 중복 제거
+            # 중복 제거
+            image_urls = list(dict.fromkeys(image_urls))
 
-            ex["imageUrl"] = image_urls
-            print(f"[상세] 이미지 개수: {len(image_urls)}")
-
-
-            # 상세 정보 exhibition dict에 추가
+            # 상세 정보 exhibition dict에 반영
             ex["artist"] = artist
             ex["description"] = description
             ex["imageUrl"] = image_urls
@@ -171,7 +274,6 @@ if __name__ == "__main__":
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-        print(f"\nJSON 저장 완료: {output_path}")
-        print(f"전시 개수: {len(data)}")
-
+    print(f"\nJSON 저장 완료: {output_path}")
+    print(f"전시 개수: {len(data)}")
     print("=========json저장 완료=========")

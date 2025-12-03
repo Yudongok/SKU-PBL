@@ -1,134 +1,168 @@
 [
   {
-    "title": "제주미술제",
-    "operatingDay": "2025. 10. 29 - 2025. 11. 24",
+    "title": "양용방 개인전",
+    "start_date": "2025-11-26",
+    "end_date": "2025-12-15",
     "address": "B1F 제1전시장",
     "galleryName": "제주갤러리",
-    "operatingHour": "AM 10:00 ~ PM 19:00(화요일 정기 휴무)",
+    "open_time": "AM 10:00",
+    "close_time": "PM 19:00",
+    "artist": "양용방",
+    "description": "사물과의 협력,\n폐기된 도구에서 찾는 즐거운 세계\n양용방 개인전 <MY LIFE>\n예술은 인간 정신의 산물이며, 자유와 창조의 의지로부터 탄생한다. 양용방의 조각은 버려진 사물과 인간의 협력에서 시작된다. 그는 산업사회의 부산물인 폐기된 식기와 도구들을 다시 살려내어, 일상의 기억과 생명의 흔적을 새롭게 호흡하게 한다.\n버려진 사물들은 작가의 손을 통해 다시 의미를 얻고, 인간의 삶과 세계를 비추는 거울이 된다. 오늘의 사회는 끝없는 생산과 소비 속에서 끊임없이 새로운 것을 만들어내지만, 그 이면에는 언제나 버려진 것들이 쌓여간다. 양용방은 바로 그 폐기된 도구 속에서 인간의 존재와 시대의 초상을 발견한다.\n사물은 그에게 단순한 재료가 아니라, 인간과 함께 살아온 또 하나의 생명이며 예술의 파트너이다. 그는 낡은 오브제들을 통해 자본주의 현실과 소비사회의 모순, 그리고 그 속에서도 살아가는 인간의 유머와 희망을 담아낸다.\n그의 작품은 무겁지 않지만 깊고, 유쾌하면서도 철학적이다. 삶의 기쁨과 고단함, 쓸쓸함과 희망이 공존하는 그의 조각은 결국 우리 모두의 이야기이다.\n<MY LIFE>는 작가 자신의 삶이자, 동시에 당신의 삶이고, 우리의 삶이다.\n사물과 인간의 협력 속에서 태어난 오래된 미래, 그곳에서 우리는 삶의 또 다른 얼굴을 마주하게 된다.\n글. 김유정(미술평론가)",
     "imageUrl": [
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_vcg4s7R6_bc65ec0ca749fdb7ae159485503ef5d236d8e470.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_HO9YEmwp_e99ea775f2a218f22466969a49b17bc83a1ff2bd.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_H34pF2nA_4a34db3093e22f76cb436b2d550a51e206061e48.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_4M1RSPNh_0ed73b6f86aa5eaed7e2a5189addf56b03248da7.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_gwnM368Z_2be8199c351b69a089005d835d8b0144c9a55105.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Pza5xrfW_dd4caceb7941972ce2b5d6a9ddeb1faa1a893861.jpg"
-    ],
-    "artist": "김영갑,허민자",
-    "description": "* 김영갑 작품이미지 제공 김영갑갤러리두모악\n열일곱 개의 단체, 여섯 개의 공간, 304명의 참여 작가\n제주미술 70여년의 시간을 단체중심으로 돌아보고 보다 많은 미술인들이 참여하는 실질적인 화합의 축제를 꿈꾼다!\n제29회 제주미술제 예술감독\n오 창 윤\n제주갤러리\n“있다”“흙으로 빚은 제주의 결!” - 도예가 허민자 -\n“내가 본 이어도!” - 사진작가 김영갑 -\n2025. 10. 29<수> - 11. 24<월>\n올해,제주미술제 제주갤러리 전시는 제주사람, 제주작가라는 의미에 대해 생각해보고 태어난 고향이 제주는 아니지만, 삶 그 자체가 제주이고 제주사람인 두 분의 작가를 조명하는 전시이다.\n벤야민(Benjamin)은 ‘아우라’와 ‘흔적을 구분하였다.\n비록 가까이 있지만 그것을 멀리 가져가는 움직임이 아우라라면, 흔적은 멀리 있는 것을 가까이 불러들인다. 제주미술에 영향을 준 두 작가의 제주자연을 담은 작품들을 현재의 맥락 속에 불러들이는 하나의 흔적, 본 전시의 궁극적 목표이다!\n여기,두 분의 작가가 있다!\n서로 다른 시기에 태어나 다른 이유로 제주로 이주하였고\n그 누구보다 제주를 사랑하고 제주자연을 작품에 담아낸 제주작가!\n도예가 허민자는 디자인, 공예교육의 불모지였던 제주에 그 뿌리를 내린 “처음”이며, 제주 자연을 사랑한 작가이다. 작가의 도예작업들 속에는 삶의 환경인 제주 자연들이 고스란히 스며있다. “스스로 그러한” 이란 뜻에 자연의 의미처럼 어쩌면 제주사람이 될 수밖에 없었던 작가의 삶에 흔적들이 작품 속에 녹아있다.\n사진작가 고김영갑은 시간과 개발, 그 속에 변화하는 제주자연의 대한 작가만의 시선이 있다. 시간을 더해 제주자연의 시간을 기록한 그의 작업들은 제주와 제주미술, 지역산업에 큰 영향을 주었다.\n사진작가 김영갑 작고 20주년의 되는 해인 2025년, 그의 작업들을 통해 과거의 시간과 작가의 시간, 사진 속 시간들을 사람들의 기억 속에서 소환시킨다.\n결>\n제주미술제는 제주미술인들의 축제이다! 예술감독 제의를 받은 순간부터 머릿속 한 자리를 차지했던 생각의 문구, 이 생각을 구체화시키기 위해 유난히 무더운 여름을 사무국 식구들과 함께 고민했고 할 수 있는 최선을 다해왔다. 열일곱 개의 단체, 여섯 개의 공간, 304명의 참여 작가, 제주미술의 70여년의 시간을 단체중심으로 돌아보고 보다 많은 미술인들이 참여하는 실질적인 화합의 축제를 꿈꿨다. 그럼에도 불구하고 부족함이 많다.\n‘의미는 종착지에서 완성된다’라는 독일의 철학자 한스 게오르크 가다머(Hans-Georg Gadamer)의 말처럼 제주미술제의 의미는 29회를 맞이하는 올해의 미술제가 아닌 40회, 50회, 미래의 미술제를 거치면서 더욱 구체화되고 완성되어질 것이다. 그러므로 동태적인 관점으로 바라봐 주길 바란다.\n난 올해의 미술제가 명확하게 정립되지 않은 제주미술제의 정체성에 대해 정립하고 70년을 넘어 제주미술의 미래100년을 잇는 출발이 되기를 희망해본다.\n그러기 위해서는 무엇보다 제주미술제에 대한 명확한 정립이 필요하다. 기획과정에서 가장 많이 생각하고 고민했던 지점, 제주미술제가 무엇이고 나아갈 방향이 무엇일까라는 원론적인 질문을 제29회 제주미술제의 끝 지점에서 다시 던진다!\n“제주미술제는 기획전시인가? 연합전시인가? 축제인가?!”"
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_tY2dpZeF_a6552203fd70c6924185505024430340299b7bcb.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Q7jeOizP_307b79c47943771f887db9c816fccd704226b925.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Ey6eoM0A_9d556787a6f74fb214ff4647efd4afed1597b19a.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_jCt2cIvo_db8a7ea81e60032e053e2aa5455b413fcb7263bd.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Szlwie9I_6080ea205668676de8fe0d0f47d503355baeaae4.jpg"
+    ]
   },
   {
-    "title": "서울시 무형유산 보유자전",
-    "operatingDay": "2025. 11. 19 - 2025. 11. 24",
+    "title": "블루전",
+    "start_date": "2025-12-03",
+    "end_date": "2025-12-08",
     "address": "1F 본전시장",
     "galleryName": "인사아트센터",
-    "operatingHour": "AM 10:00 ~ PM 19:00(화요일 정기 휴무)",
+    "open_time": "AM 10:00",
+    "close_time": "PM 19:00",
+    "artist": "권기철·김희진·노신경·모용수·문기전·박윤순·신주호·이경훈·이진아·이해기·임종두·정보연",
+    "description": "2025년 한 해를 마무리한다는 아쉬움과 첫눈과 새해를 맞이한다는 설렘이 함께하는 12월, 제6회 블루회 전시를 열게 되었습니다.\n블루회는 다양한 스타일로 개성 있게 작업하시는 작가분들과 여러 분야에서 각자 자신의 자리를 지켜내 오신 분들이 후원회를 구성하여 함께 어우러져 있습니다.\n서로가 다르지만, 전시를 통해 서로 교류하고, 그림을 진심으로 좋아하는 마음으로 공감하며 소통해 나가고 있습니다.\n'아름답다' 의 어원은 '아(我)답다'에서 온 것으로, '나답다' 라는 뜻으로 해석된다고 합니다.\n아름이 '앎'에서 유래 되었다고도 하는데, 나를 안다는것, 가장 나다운 것이 '아름답다'라는 것입니다.\n예술을 통해 자신을 표현하고, 모든 것이 제각기 다 개성을 갖추고 있음을 알아감으로써 아름다워지고, 그래야만 인간이 인간다운 삶을 잃지 않고 영위해 나갈 수 있으리라 생각합니다.\n다가오는 인공지능(AI) 시대에 지켜내야 할 인간의 존엄성을 생각하면 더욱더 다양한 분야의 예술 활동이 필요하다고 절실하게 느껴집니다.\n오랜 시간 농부가 참고 견디며 땅의 열매를 기다리듯이 그림을 그리시는 작가 선생님들과 전시를 열어 주시고 응원해주시며 성장해 나가는 것을 지켜보아 주시는 후원회원님들께 진심으로 감사드립니다.\n지난 5년간 블루회 작가회를 이끌어주셨던 임종두 회장님, 강유림 총무님께 깊이 감사드리며 수고 많으셨습니다.\n2025.12.3\n블루회 작가회 회장 정보연",
     "imageUrl": [
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_YSL4tfnX_e296f83c33ee3198d6877669541b6a757fdeb392.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_TWwtr3al_a3ad6eef116f3460d5e2f0e980b9f46febc5dba2.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_zcrY38P5_b004bae8c0bf0761be91f977c90da09b6e70b187.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_2AzHBp9N_e4e6e244fde6f1e873e7d09cbe28900036c7be49.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_PyH0l9S3_c6a81dc52b7fbf3be015b8049068ebeceb0108b9.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_0nupRMlq_b9a2d0e68facfd0d15721d02f744805313cdaade.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_b5ELmn9V_c72125e4fae3c469f40d62365a10ee968194185a.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_ntzmcjFX_cb4eae7cbcb90707b1f3c079076a8a323cfc607f.jpg"
-    ],
-    "artist": "서울무형유산기능보존회",
-    "description": "안녕하십니까.\n(사) 서울시 무형유산 기능보존회 이사장 정명채 입니다\n금년이 광복80주년 기념으로 서울시 무형유산 기능 보유자 옻칠장, 황모칠장, 자수장, 나전장, 민화장, 소목장(가구), 소목장(창호), 옥장, 홍염장, 석조각장, 석구조장 11개 분야가 11월 19일~11월24일까지 인사이트센터 1층 본관에서 보유자 전을 개최하게 되었습니다. 이번 전시회를 통해 어려운 여건 속에서도 전통문화에 대한 애정과 열정으로 작품활동을 이어가고 있는 보유자분들의 뛰어난 작품성과 우리 문화에 대한 자긍심을 되새기는 소중한 시간이 되시길 바랍니다."
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Ivtg5KH7_27efdd40160d5b29ac57d2914a045db8c3dd6f51.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_VjogFZx1_ca40b92ddfc00f37842526ca0f92c8720887776b.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_kHMAmXci_460982c97a3c38833962cfe427fdb2f4620353e0.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_3IFeMgsS_f97940eca2e6d3ff2d7dba716fb4c395fe3b1e38.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_2jsrufgX_fa501cea64fae1dc69a8d236106e986850c715be.jpg"
+    ]
   },
   {
-    "title": "김동영 개인전",
-    "operatingDay": "2025. 11. 19 - 2025. 12. 01",
+    "title": "최익규 개인전",
+    "start_date": "2025-12-03",
+    "end_date": "2025-12-15",
     "address": "2F 제2전시장",
     "galleryName": "충북갤러리",
-    "operatingHour": "AM 10:00 ~ PM 19:00(화요일 정기 휴무)",
+    "open_time": "AM 10:00",
+    "close_time": "PM 19:00",
+    "artist": "최익규",
+    "description": "한동안 의미 없는 단순한 바느질 선 긋기와 즉흥과 우연에 기댄 유희적 바느질 선 드로잉의 반복을 해왔다. 최근에는 그 위에 채색을 덧 입혀 나름 바느질에 반복에 지루함에서 나름 예술처럼 느껴지도록 화장하기도 하고, 이번 작업엔 바느질을 완전히 빼고 물감을 여러번 덧 칠해서 두껍게 떡칠하여 진득함이 묻어나오는 (마치 시간의 때가 켜켜히 쌓인 것 같은) 물성을 즐기고 있다. 나는 내 작업이 내 삶에 충분히 성숙되지 않는 철학? 또는 소위 예술적이라는 의미 들를 지워 냄 으로서 비로소 진솔한 의미가 생기고, 예술적인 어떤 성역을 부정하는 작업을 추구하므로 나름 순수한 본질에 가까워진다고 생각하게 됐다. 그러므로 최대한 의미를 제거한 반복적 노동행위를 통한 미련한 성실성에 기댄 시간들을 즐기고자 했다.\n나는 왜 이러고 있을까? 어리숙한 예술에 대한 불안한 믿음과 알 수도 없는 예술적이라는 설익은 행위들이 나의 귀중한 짧은 삶과 연결되어 있다고 생각하기 때문에 늘 불안해 하면서 마치 안개 속을 방황하며 갈 팡 질 팡 이리저리 걷고 있다. 날것의 나의 미숙함을 드러낸 솔직한 인생철학적 고백에 기댄 작업 행위들이 결국은 나의 솔직한 자화상에 가깝지 않을까? 그러길 바란다.",
     "imageUrl": [
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_UmoltipM_e635e27b11ce858508d637647a267387372de3db.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_1o7hOGMK_03aa01fa1c8adc7b28a632bbfc1accf291eba528.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_6yJu78vL_0526ef40663e3f7ec026383b0dd036efc7be0f0d.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_fnMQAmyw_d281b967aa7b894e20af0e1f8605e8026ef5c4ec.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_fzErcTgq_b32e53c5f48a2810fb56f1ae956c045335b05a1a.jpg"
-    ],
-    "artist": "김동영",
-    "description": "나의 작품은 하나님과 인간에 대한 물음으로부터 시작된다. 하나님은 누구인가? 인간은 어떤 존재인가? 그래서 나는 누구인가? 그래서 끊임없는 하나님과 사람과의 대화의 연속이 작업의 시작이며 영원히 끝나지 않는 노래이다. 다시 말하면 나의 작업 과정은 평면에서 하나님의 마음과 인간의 독백으로 또 하나의 공간을 찾아가는 여정이다.\n작품의 화면 위에 인간 욕망 즉 행운의 상징성으로서 네잎클로버가 표현하고 있다. 그러나 내 작업에서의 네잎클로버는 인간의 외적 욕망의 상징이 아니라 일상의 삶에 존재하는 가능성과 성찰의 시각적 메타포이다.\n인간의 욕망과 신의 마음이 서로를 품을 때 신비가 나타난다.- 즉 질서(cosmos)이고 조화이다. 내 작업은 이들 존재들이 서로를 품으면서 교감을 생성하고 - 이러한 현상 속에서 작업은 형상화되어 보이는 것과 보이지 않는 것들 사이의 관계에 대한 질문과 탐구의 과정이다."
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Zf4ts1iV_386bd4ea508cceecde7c6376126ae10c911e437a.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_PN8YcBtH_be1ac73ec668a3296163b25e3eefa7631b81f07d.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_7EqxeXZC_c5bb50616591ab8aa14f4d0b5d979c1ac7133628.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Xhk5TbEe_27f7d9523339df63d39eaba5f873be79669fb977.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_DWA3M7Fj_804d5cfccda69756c9e3a60e7d353fc979114e06.jpg"
+    ]
   },
   {
-    "title": "홍자경 개인전",
-    "operatingDay": "2025. 11. 19 - 2025. 11. 24",
+    "title": "Three Colors, Three Artists",
+    "start_date": "2025-12-03",
+    "end_date": "2025-12-08",
     "address": "3F 제3전시장",
     "galleryName": "G&J갤러리",
-    "operatingHour": "AM 10:00 ~ PM 19:00(화요일 정기 휴무)",
+    "open_time": "AM 10:00",
+    "close_time": "PM 19:00",
+    "artist": "여무웅,한임수,김준용",
+    "description": "김준용 작가는 각박한 현실 속에서 지나치기 쉬운 작고 소박한 존재들의 아름다움을 화폭에 담아냅니다. 그의 작품 속 길 위의 사람들, 농촌의 아낙네, 뛰어노는 아이들의 모습은 작가 유년 시절의 행복했던 기억과 자연에 대한 그리움을 표현한 것입니다. \"지난 시절의 추억과 행복, 그리움은 시간이 흐를수록 희미해지지만, 살아가는데 힘이 되어준다\"는 메시지를 통해 관람객들에게 따뜻한 위로를 전합니다.\n여무웅 작가는 구상 회화의 기본기를 바탕으로 대상에 대한 애정을 흔들림 없는 묘사력으로 표현합니다. 그는 새로움이나 독창성보다는 정물이나 인물에서 느껴지는 일상적인 느낌과 숭고함을 추구합니다. 우리의 민화나 전통적인 문양을 사물과 조화시키는 방식으로 한국적인 미를 직접적으로 표현하며, 전통에 대한 관심과 공감대를 불러일으킵니다. 이번 전시에서는 작가의 섬세한 필치로 펼쳐지는 구상회화의 진수와 함께, 쉽게 접하기 힘든 전통 민화를 큰 화면으로 만나볼 수 있습니다.\n한임수 작가는 순천만의 칠면초 군락과 하늘의 변화무쌍한 빛깔에서 영감을 받습니다. 그의 그림은 단순히 눈에 보이는 풍경이 아니라, 붉은 갯벌에 대한 깊은 사유와 내면의 고독을 표현한 것입니다. 형체 없는 새들의 날갯짓 소리, 피지 않은 갈대 소리를 채워 넣으며 보이는 대상과 보이지 않는 경계의 지점을 탐색합니다. 거친 붓질로 표현된 역동적인 하늘은 작가의 끝없는 열정과 심장의 고동소리를 담아내고 있습니다.",
     "imageUrl": [
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_mhYlvzaX_df314f9bc64814131c5e694b4fcfce47091b4119.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_xUnMmRXO_434abb5a67d4facd3ae95d4a34bb18d02557dc8a.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_0HEKISzU_f54014d970863734b2d4dd341350c8a7ec455276.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_tgwGDzbh_6a143925dd89f6f349b9aeefc49e3c07d4540b90.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_itFR10g9_ab7860b56e1ca5283cd2203d720ca08e0b597197.jpg"
-    ],
-    "artist": "홍자경",
-    "description": "My story의 Bag 시리즈는 나를 둘러싼 가족, 친구, 그리고 낯선 사람들에 관한 관심과 관찰에서 시작했다.\n특별할 것도 없이 평범했을 하루는 타인을 물끄러미 관찰하며 누군가의 삶에 대해 상상의 나래를 펼치는 순간 아주 특별한 하루가 된다. 누군가의 표정, 걸음걸이, 옷차림을 근거로 그의 생각과 삶을 상상하는 것은 꽤 흥미로운 일이다. 가끔은 여러 가지 단서들이 퍼즐을 맞추듯 딱 떨어지는 인과관계가 완성될 때의 쾌감이야말로 빼놓을 수 없는 관찰자의 즐거움일 것이다.\n사람의 외모, 걸음걸이, 단어 선택, 목소리와 어조를 통해 타인의 삶을 미루어 짐작하며 이해하려 드는 이 쓸모없고 무용하기만 한 습관은 어느덧 내 삶의 태도가 되었다. 어느덧 외부를 향한 시선은 내부로 향했다. 나 자신을 들여다보게 되었고 내 생각과 삶을 멀찍이 거리를 두고 타인을 관찰하듯 바라보았다. 내가 보낸 오늘 하루가 글의 한 페이지가 되고, 내가 겪는 일련의 사건들과 감정의 소용돌이는 책의 한 장을 이루었다. 지금 돌아보니 나름 힘들었고 갈팡질팡했던 어렵고 고단했던 삶의 고비들을 3인칭 관찰자의 시점 덕분에 그럭저럭 잘 넘겼던 것 같다.\n관찰은 내부의 나로부터 시작하여 타인으로, 그리고 인간과 인간 공동체로 향했다. 내 주변의 관계적인 ‘사람’에 대한 관찰은 보편적인 인류인 ‘인간’으로 옮겨져 갔다.\n그러므로 내 작업의 화두는 관찰을 통해 내 안을 들여다보고 나를 이해하는 과정에서 타인과 사회에 대한 관찰과 이해에 이르는 사람에 대한 이해에 관한 것이다.\n우선 평범한 생활인인 나의 삶을 들여다보자. 나는 하루 24시간 쉴새 없이 실시간으로 자신을 홍보하고 소비를 부추기는 사회 속에 살아가고 있다. 매체를 통해 발견하는 누군가의 트랜디한 신상품으로 무장한 집, 패션, 그리고 화려한 삶과 건강하고 아름다운 외모는 어느새 흔한 풍경이 된다. 이런 장면을 꿈꾸고 이런 삶을 지향하는 것이 너무도 당연한 것 같다. 그러나 화려한 빛의 반대편의 어두운 그림자처럼, 지금 당장, 나라는 사람은 한없이 초라하고 부족하기만 할 뿐이다. 그래서 최선을 다해 그들처럼 안정되고 행복해 보이는 삶을 살기 위해 애쓴다. 그럴수록 나는 조바심, 소외감, 고립감 급기야는 패배감마저 든다. 이런 이상적인 삶과 행복의 기준은 누가 정한 것인가? 그리고 나는 왜 그리 애써 그 기준에 부합하려 하는 것일까? 누군가에게 인정받기 위해, 또는 이상적인 인간 그룹의 일원으로 소속감을 얻기 위해 나를 증명이라도 하듯 애쓰는 것은 아닐까? 혹여 내가 진정 그런삶을 원한다면 혹시 그렇게 믿도록 학습되고 권유된 것은 아닌가?내가 원하고 바라는 아름다움이나 이상적인 삶이란 타인의 인정을 위한 것인가 과시를 위한 것인가?\n잠깐 멈춰서 생각해 볼 일이다.\n작품을 감상하며 작품 속 누군가의 기분과 삶을 응시하고 그들의 삶을 상상해 보자. 내가 진정 원하는 삶과 소중하게 여기는 것은 무엇인지 자신의 목소리에 귀 기울여 보는 시간을 갖기를 바래본다."
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_yEdktT5j_c513162ad28c99855547e7e176284c15dd0083b3.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_ZcNmls8u_b8df2595b1d57c3d6e4ff23cdcb96eb4caaa650f.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_z5ayfJOh_e708066b45efe3f3575ef79fbbff1bdb3c2a6c3a.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_190LOgXR_3eafb073585e1925cd798c8e807262f6615590aa.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_VzW2fbBZ_2ce5b075ff90e549b57270333047be560f77a393.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_prmubQUC_a3e9a311816f38b41c1e1b5ac0d27857e2c213f4.jpg"
+    ]
   },
   {
-    "title": "황정아 개인전",
-    "operatingDay": "2025. 11. 19 - 2025. 11. 24",
+    "title": "라현주 개인전",
+    "start_date": "2025-12-03",
+    "end_date": "2025-12-08",
     "address": "3F 제1특별관",
     "galleryName": "인사아트센터",
-    "operatingHour": "AM 10:00 ~ PM 19:00(화요일 정기 휴무)",
+    "open_time": "AM 10:00",
+    "close_time": "PM 19:00",
+    "artist": "라현주",
+    "description": "우리는 누구나 한때 누군가의 기대 속에서 자리 잡거나, 누군가를 향해 문을 지키듯 머물렀던 경험을 갖는다. 애착과 보호, 역할과 책임은 그 순간에는 자연스러운 감정처럼 보이지만, 시간이 흐르면 그것이 남겨진 마음의 흔적을 어떻게 바꾸어 놓는지 천천히 드러난다. Bittersweet은 이 미묘한 관계의 정조를 포착하려는 시도에서 출발한다.\n이번 전시의 작업들은 관계 속에서 형성되었다가 어느 순간 흐트러지고, 다시 스스로의 자리를 찾기까지의 감정적 움직임을 다루고 있다. 작품 속 존재들은 때로는 머물러 있고, 때로는 떠난 자리를 바라보며, 조용히 자기의 형태를 이룬다. 그것은 비움과 남김, 보호와 이탈 사이에서 흔들리며 새로워지는 마음의 방향에 가깝다.\n나는 이 과정의 전환점을 그리려 했다. 누군가에게 의지되던 존재가 더 이상 그 역할로만 머무르지 않고, 자신을 다시 바라보는 순간. 지켜야 해서 머물던 자리가 아니라, 스스로 선택해 서 있는 자리로 변해가는 흐름. 그 사이에서 느껴지는 감정들은 단순히 밝거나 어둡지 않고, 달콤하면서도 씁쓸한 결을 동시에 지닌다.\nBittersweet은 바로 그 이중적 감정의 온도를 담아낸다.\n기다림과 애착이 남긴 부드러운 온기, 그리고 그 속에서 천천히 일어나는 자기 회복의 움직임. 작품들은 말없이 서 있지만 침묵 속에 머물지 않는다. 그 고요함은 오래도록 눌러두었던 마음이 스스로 다시 살아나는 지점, 그 미세한 진동을 품고 있다.\n이 전시는 삶 속에서 누구나 한 번쯤 겪게 되는 그 복합적인 감정들—머무르고 싶지만 . 떠나야 하고, 떠났지만 여전히 남아 있는—그 경계의 순간들을 시각적으로 나누는 장면들이다. 나는 이 장면들을 통해 관계와 기억의 잔향을 다시 바라보고, 그 안에서 새로 태어나는 ‘나’의 목소리에 귀 기울이고자 했다.\nBittersweet은 그렇게 잔잔하게 이어지는 마음의 변화들이 모여 만들어낸 풍경이다.",
     "imageUrl": [
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Zmv14Kkt_518109536c23931172fdf0ae5a682b0eb419372c.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_p1RNOTX6_40604fd40fe766a4b97f13018e1dc620b7960b70.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_u0lRh3td_93401877f048bd9eb33526aa1ed2b146e152c039.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_lCFfkdDr_d42c25899f970036c358dbe50cf5b39d3c9aaccb.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_BQRudjmT_08b0803128d165147cdf9088cf596adb2c2140c3.jpg"
-    ],
-    "artist": "황정아",
-    "description": "황정아 작가 노트\n마음이 고요해지는 그 순간의 풍경\n이번 전시 작품은 현실의 경계 너머 마음이 머무는 풍경을 그리고자 했다.\nBeyond Windows, Garden, Dreaming 시리즈 작업의 매 순간마다 마음은 창문 너머로 날아가 한 마리의 새가 된다. 그 새는 바람을 타고 길을 나서며, 빛과 자연의 풍경 속에서 고요한 울림을 듣는다.\n화면에 담긴 풍경은 실제 공간이 아닌 마음이 쉬어가는 내면의 안식처이자 정원이다.\n탁자 위의 꽃병에는 다양한 색의 꽃들이 가득 피어있어, 마치 마음속의 설렘과 그리움을 한 데 모은 듯하다. 또한 작은 새는 창가에 앉아 먼 곳을 바라본다. 그 순간 시간은 멈춘 듯 고요하다. 이 풍경 속에서 마음은 어느새 따뜻한 기억 속으로 스며든다.\n나의 작업은 순간의 울림을 기록한 마음의 풍경이며 일상 속에서 잊혀진 평화로움과 사색의 시간을 회복하는 여정이다.\n풍경 속에 잠시 머물며 고요한 쉼과 따스한 위안을 느낄 수 있길 바란다."
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_BLQFvegG_f179f196facda8dd90bca450bd5a8195458ba8aa.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_l3MrmbiH_c0a20c4863042b4ba907860ae8d3e05820dbd5c6.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_70eSzyWl_05af6c57666306cc7a9c646370d23d5195e1e595.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_8E9Nz43U_c59bd5b0a6cc835e82c2c978ebcecda735c9671e.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_nMtEKs7e_38d3760bdfdff5ad6c56891f3897807c5cca8f9b.jpg"
+    ]
   },
   {
-    "title": "송영주 개인전",
-    "operatingDay": "2025. 11. 19 - 2025. 11. 24",
+    "title": "이병헌 개인전",
+    "start_date": "2025-12-03",
+    "end_date": "2025-12-08",
     "address": "4F 제4전시장",
-    "galleryName": "부산갤러리",
-    "operatingHour": "AM 10:00 ~ PM 19:00(화요일 정기 휴무)",
+    "galleryName": "인사아트센터",
+    "open_time": "AM 10:00",
+    "close_time": "PM 19:00",
+    "artist": "이병헌",
+    "description": "지금까지 인간과 자연의 아름다움을 주로 그려왔다. 미술 사조로는 인상주의와 자연주의 그리고 사실주의와 초현실주의에 가까운 그림 스타일로 작품마다 조금씩 다르게 표현했고 늘 변해가는 자연에 대한 탐구와 인생의 덧없음을 표현하려고 노력해 왔다. 관념과 편견에서 탈피하여 무한한 가능성과 현대 미술 사조 변화에 조응하며 리얼리즘과 슈러 리얼리즘을 기반으로 다 시각화와 다 시점화 그리고 모호성 등 기존의 아카데미즘을 극복한 나만의 창조성을 찾는 것에 목표를 둔다.\n하지만 사조에 너무 구속되지 않고 소재와 재료 등 그 작품을 대할 때 감정에 따라 기법과 스타일에서 자유롭게 표현하려고 노력한다.\n이번 개인전에는 Pink와 Yellow색을 많이 사용한 그림들로 밝은 이미지와 경쾌한 느낌의 자연 풍경과 인물화에서도 밝고 경쾌한 느낌을 주려고 노력했다",
     "imageUrl": [
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_PjlhtFqN_296750140ce96e736b0a6c0e00f63147209423c0.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_dJReaCOq_0530351b8ae22c7e2a113d0e63820dc5f6e50cc5.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_HQngfNXK_b275c00766a84c65048ffcfd98cf357e8389d708.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_LDFrhgV9_10d13902f9203e7184261ec6da5ef040b7509f89.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_8NvG36Rn_0b828c8ffe23de4fd39d6a857e6b3e640d2b2273.jpg"
-    ],
-    "artist": "송영주",
-    "description": "전시회 설명\n산과 나무, 꽃과 하늘, 별과 달, 해와 우주에 이르기까지 경이로운 자연의 숨결을 화폭에 담고자 합니다. 따뜻하고 밝은색으로 자연의 아름다움을 표현하며, 선과 색이 어우러져 보는 이의 마음을 다정히 감싸는 그림이 되기를 바랍니다."
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_iNBZ7RPs_354040b64353547eccfd2d643e3c9f73c749c231.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_YOfi37Rm_48ebd6885bf3782c6864dd809790281cfb0d5821.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Snzi6JER_ab44c61a11d89b12c2c82fab3c54a16ec6e59203.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_CGge6f1Z_ba9d4bdce1dd4dd0928c328aea5b9dcc0ccef403.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_phynUK7l_571a3506b1116d22c5f2e2d8338e22dfeb56c18b.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Fcj7Gya6_6b2431e30c655824bcbbbe1ecbd6d13454833138.jpg"
+    ]
   },
   {
-    "title": "허방미 개인전",
-    "operatingDay": "2025. 11. 19 - 2025. 11. 24",
+    "title": "VOID&FULL",
+    "start_date": "2025-12-03",
+    "end_date": "2025-12-08",
+    "address": "4F 제2특별관",
+    "galleryName": "인사아트센터",
+    "open_time": "AM 10:00",
+    "close_time": "PM 19:00",
+    "artist": "김필희·김희연·이경희·이남규·장종순·정영미·조인숙",
+    "description": "VOID&FULL 모임은 현대미술의 조형적 실험을 하는 25년 지기 미술가 모임으로 각자의 자리에서 개성있는 작업을 하며 개인적으로 작가활동을 하며 틈날 때 마다 모여 서로의 작업에 조언과 위안을 나누는 25년 인연을 맺은 현대 여성작가님들입니다.\n이 겨울로 가는 초입에 김필회,김희연,이경희,이남규,장종순,정영미,조인숙작가님들이 다시 모여 저마다 독특한 현대적인 조형미술 작품들을 전시장을 통해 뜻깊은 작품전을 개최하게 되었습니다.\n그동안 함께한 순간들이 연륜으로 쌓여 보다 특별한 작품들로 전시장을 빛나게 하겠습니다.",
+    "imageUrl": [
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_3siFwfUh_1a4f23ed99c1e4bb6966812e5e6c667b983cf511.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_oHk5mUDC_64a04e7695aa8d7b38f16fc746dfe1a7c902c9b8.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_v5NUQOz3_72b94cff639221933f39056f1fdb11cfc038875e.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_MoREc5sq_eb6ee53a27274df2ef6c4301835a292d0e4f7bdd.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_MaItpKqg_52c211e7243ebee5067a509a6d0d84d91a472714.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_V7mC4nvz_33f36d929a473fec2a95f6c0b75b2b7e84c20950.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_od1B8Ym6_835c69ea49d968e54fde8fa88e4543951d1bcf7e.jpg"
+    ]
+  },
+  {
+    "title": "최혜숙 개인전",
+    "start_date": "2025-12-03",
+    "end_date": "2025-12-08",
     "address": "5F 제5전시장",
     "galleryName": "경남갤러리",
-    "operatingHour": "AM 10:00 ~ PM 19:00(화요일 정기 휴무)",
+    "open_time": "AM 10:00",
+    "close_time": "PM 19:00",
+    "artist": "최혜숙",
+    "description": "-",
     "imageUrl": [
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_LHEynA96_38d52f6ad8a6320776ffd20eee70ad83a5ec519e.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_AYksIKJE_a9308d5ca8b63c28230cd3e21a60961a4d588a1f.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Txsf5ILt_2e27aa26b1b95348f7e55264420d4172f5b5ae69.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_RCl7MIsh_6f88e98d34fc04d71e4d44947f2bb5ad2fb14401.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_9cexouqW_cc6be76973a33c1e77c7569d42a79fa3c792c99c.jpg"
-    ],
-    "artist": "허방미",
-    "description": "자연은 언제나 서로를 감싸 안는 조화의 질서 속에 존재합니다.\n빛과 바람, 물과 생명은 서로의 흐름을 느끼며 공존하고,\n그 안에서 우리는 보이지 않는 감정의 울림을 경험합니다.\n본 전시는 자연의 구조적 질서와 조형적 언어를 통해 ‘공존과 공감’의 의미를 탐구한 회화 작업을 선보입니다.\n형태를 넘어선 색과 선의 추상적 표현 속에 자연과 인간이 함께 숨쉬는 조화의 세계가 담겨 있습니다.\n이 작품은 서로 다른 존재들이 만들어내는\n미묘한 공감의 결을 시각적으로 드러내며,\n우리 모두가 자연의 일부로 이어져 있음을 이야기합니다.자연은 언제나 서로를 감싸 안는 조화의 질서 속에 존재합니다"
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_zDV2Yxt1_d5e7266cc74ed4f38d952ae661f363e8eccc26b0.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_MRf4wVkE_145aebd1c878e5af4a6b9a94fcccf15e04e6c4b4.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_UrzeTl9N_1fba3bd662ed5f81c4038a76bd0b716a6b0f47b3.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_fZ9NF5Dg_0deaaed84f57e241b32db4b6c5d94318c7dc86c7.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_mznIRZOc_c2310e998dc21e33308f3fedab08387060ce0654.jpg"
+    ]
   },
   {
-    "title": "너의 빛, 우리의 무지개",
-    "operatingDay": "2025. 11. 19 - 2025. 11. 24",
+    "title": "접사모 사진전",
+    "start_date": "2025-12-03",
+    "end_date": "2025-12-08",
     "address": "6F 제6전시장",
     "galleryName": "인사아트센터",
-    "operatingHour": "AM 10:00 ~ PM 19:00(화요일 정기 휴무)",
-    "imageUrl": [
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_ODGxfwrc_f9a242cc2b62b73ec9831b61eb4df797aeb0575b.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_z5eEWtUg_00f995b3269b317244f8c1c63f5ce7819ff7026b.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Lv8jf1Nq_6c585702909fd07e1f16f15833192d925c07f315.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_eJQPS3Kz_894e3d3bd08f3f7153ebc9d27d4b676538b8cb6e.jpg",
-      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_XU48dzVM_63cc0f9944eb4da15b1a8f18eea32a1c941c3d25.jpg"
-    ],
+    "open_time": "AM 10:00",
+    "close_time": "PM 19:00",
     "artist": "",
-    "description": "2025 JW ART AWARDS\nJW이종호재단은 생명을 존중하고 나눔을 실천한다는 정신을 바탕으로,\n2015년부터 장애예술인을 위한 아트 어워즈를 운영하며\n그들의 재능을 발굴하고 응원해 왔습니다.\n올해도 이어지는 여정 속에서,\n전시장에서 작품에 담긴 시선과 이야기에 잠시 머물러 보시길 바랍니다.\n창작의 세계는 독창적이고 깊은 울림으로 다가와,\n삶을 바라보는 새로운 관점과 의미 있는 질문을 건넬 것입니다."
+    "description": "반갑습니다.\n′작은세상 아름다운 이야기′를 만들어 가는 사진 동호회 접사모입니다.\n접사모 전시회에 함께 해 주셔서 감사합니다.\n제22회를 맞이하는 이번 전시는 피사체를 가까이에서 촬영하는 접사(Close-up)사진을 중심으로 ‘작은세상 이야기’를 예술적인 표현으로 펼쳐 감동을 선사하고자 마련되었습니다.\n그 감동을 여러분과 함께 나누고자 저희 회원들이 전국의 산하를 다니며 담은 소중한 작품을 한자리에 모았습니다.\n여러분의 소중한 관심과 참여가 전시의 큰 힘이 됩니다. 아름다운 이야기를 여러분께 전할 수 있게 된 것에 큰 기쁨을 느끼며 많은분들과 함께 일상의 힐링이 되는 특별한 시간이 되시기를 기대합니다.\n접사모 운영진 일동",
+    "imageUrl": [
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_9t05D8fd_3457c18866619cc5fafe3bfb8d7d32bd33e36be6.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_Ku2GP0lZ_0b9224198992ba72c1c69c36b71b7717f585d118.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_s1pz5AtS_b1065b6a02d16e0925a7496ccdb7964f912428b0.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_2YEpetUo_4f747bb47b0762e71416533ba257b82f0da4c48b.jpg",
+      "https://www.insaartcenter.com/data/file/exhibition_current/f908992e10ec9c87f45e0f975130eaa9_HvJfwVXG_6366bc6c88c9c641957f0072f2cf1c4e2d067d69.jpg"
+    ]
   }
 ]

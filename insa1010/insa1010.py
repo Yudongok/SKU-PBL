@@ -4,6 +4,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import json
 import os
+import re
+from datetime import datetime
 
 # ------------------------
 # 기본 설정
@@ -17,6 +19,117 @@ LIST_URL = "https://www.insa1010.com/28"
 
 # OpenAI 클라이언트 (환경변수 OPENAI_API_KEY 사용)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+
+# ------------------------
+# 날짜/시간 파싱 유틸 함수들
+# ------------------------
+
+def parse_single_date(part: str, base_date: datetime | None = None) -> datetime | None:
+    """
+    part: '2025.12.3', '2025. 12. 03', '12.8', '8' 같은 문자열
+    base_date: 연/월이 생략된 경우 참고할 기준 날짜
+    """
+    if not part:
+        return None
+
+    # 앞뒤 공백 제거
+    s = part.strip()
+    # "2025. 12. 03" -> "2025.12.03" 처럼 점 주변 공백 제거
+    s = re.sub(r"\s*\.\s*", ".", s)
+
+    # 1) YYYY.MM.DD 형식
+    m = re.match(r"^(\d{4})\.(\d{1,2})\.(\d{1,2})$", s)
+    if m:
+        y, mth, d = map(int, m.groups())
+        try:
+            return datetime(year=y, month=mth, day=d)
+        except ValueError:
+            return None
+
+    # 2) MM.DD 형식 (연도는 base_date에서 가져오기)
+    if base_date:
+        m = re.match(r"^(\d{1,2})\.(\d{1,2})$", s)
+        if m:
+            mth, d = map(int, m.groups())
+            try:
+                return datetime(year=base_date.year, month=mth, day=d)
+            except ValueError:
+                return None
+
+    # 3) DD 형식 (연/월은 base_date에서 가져오기)
+    if base_date:
+        m = re.match(r"^(\d{1,2})$", s)
+        if m:
+            d = int(m.group(1))
+            try:
+                return datetime(year=base_date.year, month=base_date.month, day=d)
+            except ValueError:
+                return None
+
+    # 다 안 맞으면 실패
+    return None
+
+
+def parse_operating_day(operating_day: str):
+    """
+    예시:
+      '2025. 11. 26 - 2025. 12. 15'  -> ('2025-11-26', '2025-12-15')
+      '2025.12.3-12.8'               -> ('2025-12-03', '2025-12-08')
+      '2025.12.3 ~ 12.8'             -> ('2025-12-03', '2025-12-08')
+      '2025.12.3 ~ 2025.12.8'        -> ('2025-12-03', '2025-12-08')
+    실패 시: (원본 문자열, "")
+    """
+    if not operating_day:
+        return "", ""
+
+    text = operating_day.strip()
+
+    # ~, -, –(엔대시) 기준으로 앞/뒤 나누기 (한 번만 split)
+    parts = re.split(r"\s*[-~–]\s*", text, maxsplit=1)
+    if len(parts) != 2:
+        # 형식 이상하면 그냥 통째로 start_date에 넣고 end_date는 빈 값
+        return text, ""
+
+    start_part, end_part = parts[0], parts[1]
+
+    # 앞 날짜 먼저 파싱
+    start_dt = parse_single_date(start_part)
+    if not start_dt:
+        # 시작 날짜도 못 읽으면 그냥 통째로 start_date
+        return text, ""
+
+    # 뒤 날짜는 연/월이 없으면 앞 날짜 기준으로 보완
+    end_dt = parse_single_date(end_part, base_date=start_dt)
+    if not end_dt:
+        # 끝 날짜 못 읽으면 시작만 반환
+        return start_dt.strftime("%Y-%m-%d"), ""
+
+    return start_dt.strftime("%Y-%m-%d"), end_dt.strftime("%Y-%m-%d")
+
+
+def parse_operating_hour(operating_hour: str):
+    """
+    예시:
+      '10:00 ~ 18:00'
+      '10:00-18:00'
+      '10:00 – 18:00(월요일 휴관)'
+    -> ('10:00', '18:00')
+    """
+    if not operating_hour:
+        return "", ""
+
+    # 괄호 뒤 설명 제거
+    base = operating_hour.split("(", 1)[0].strip()
+    # ~, -, – 기준으로 쪼개기
+    parts = re.split(r"\s*[-~–]\s*", base)
+    if len(parts) != 2:
+        # 쪼개기 실패하면 전체를 open_time으로만 사용
+        return base, ""
+
+    open_time = parts[0].strip()
+    close_time = parts[1].strip()
+    return open_time, close_time
 
 
 # ------------------------
@@ -173,20 +286,34 @@ def crawl_exhibitions():
             # (C) GPT에게 정보 추출 요청
             gpt_data = extract_fields_with_gpt(description_text, image_urls)
 
-            # (D) exhibition dict 구성 (detail_url은 저장하지 않음)
+            # (D) 날짜/시간 파싱
+            start_date, end_date = parse_operating_day(gpt_data["operatingDay"])
+            open_time, close_time = parse_operating_hour(gpt_data["operatingHour"])
+
+            # (E) exhibition dict 구성
             ex.update({
                 "title": gpt_data["title"],
                 "description": gpt_data["description"],
-                "imageUrl": image_urls,  # 전체 이미지 리스트도 같이 저장
+                # 전체 이미지 리스트
+                "imageUrl": image_urls,
+                # GPT가 선택한 대표 이미지(원하면 따로 쓸 수 있음)
+                "mainImageUrl": gpt_data["imageUrl"],
+                # 원본 텍스트 형태도 보존
                 "operatingHour": gpt_data["operatingHour"],
                 "operatingDay": gpt_data["operatingDay"],
+                # 파싱해서 나눈 필드들
+                "start_date": start_date,
+                "end_date": end_date,
+                "open_time": open_time,
+                "close_time": close_time,
                 "galleryName": "인사1010",
             })
 
             print(f"[상세] 제목: {ex['title']}")
-            print(f"[상세] 운영시간: {ex['operatingHour']}")
-            print(f"[상세] 운영일: {ex['operatingDay']}")
-            print(f"[상세] 대표 이미지: {ex['imageUrl']}")
+            print(f"[상세] 운영시간(raw): {ex['operatingHour']}")
+            print(f"[상세] 운영일(raw): {ex['operatingDay']}")
+            print(f"[상세] start_date: {ex['start_date']}, end_date: {ex['end_date']}")
+            print(f"[상세] open_time: {ex['open_time']}, close_time: {ex['close_time']}")
             print(f"[상세] 이미지 개수: {len(image_urls)}")
 
         browser.close()
@@ -214,9 +341,13 @@ if __name__ == "__main__":
     for ex in data:
         print("\n==================== 전시 ====================")
         print("제목:", ex.get("title", ""))
-        print("운영시간:", ex.get("operatingHour", ""))
-        print("운영일:", ex.get("operatingDay", ""))
-        print("대표 이미지:", ex.get("imageUrl", ""))
+        print("운영시간(raw):", ex.get("operatingHour", ""))
+        print("운영일(raw):", ex.get("operatingDay", ""))
+        print("start_date:", ex.get("start_date", ""))
+        print("end_date:", ex.get("end_date", ""))
+        print("open_time:", ex.get("open_time", ""))
+        print("close_time:", ex.get("close_time", ""))
+        print("대표 이미지(mainImageUrl):", ex.get("mainImageUrl", ""))
 
         print("\n[설명 텍스트]")
         desc = ex.get("description", "")
