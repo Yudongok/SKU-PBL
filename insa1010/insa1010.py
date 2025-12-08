@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 import json
 import os
 import re
-from datetime import datetime
+from datetime import datetime, date
+import psycopg2  # PostgreSQL 연동용
 
 # ------------------------
 # 기본 설정
@@ -14,7 +15,7 @@ from datetime import datetime
 # .env 파일에서 환경변수 로드
 load_dotenv()
 
-# 갤러리 인사아트의 현재 전시 url
+# 갤러리 인사아트(인사1010)의 현재 전시 url
 LIST_URL = "https://www.insa1010.com/28"
 
 # OpenAI 클라이언트 (환경변수 OPENAI_API_KEY 사용)
@@ -27,18 +28,35 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def parse_single_date(part: str, base_date: datetime | None = None) -> datetime | None:
     """
-    part: '2025.12.3', '2025. 12. 03', '12.8', '8' 같은 문자열
+    part 예시:
+      - '2025.12.3'
+      - '2025-12-03'
+      - '2025년 12월 3일'
+      - '12.8'
+      - '12월 8일'
+      - '8'
     base_date: 연/월이 생략된 경우 참고할 기준 날짜
     """
     if not part:
         return None
 
-    # 앞뒤 공백 제거
     s = part.strip()
-    # "2025. 12. 03" -> "2025.12.03" 처럼 점 주변 공백 제거
-    s = re.sub(r"\s*\.\s*", ".", s)
 
-    # 1) YYYY.MM.DD 형식
+    # 한글 날짜 표현을 점(.) 기반으로 정규화
+    # 2025년 12월 3일 -> 2025.12.3
+    s = re.sub(r"(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일?", r"\1.\2.\3", s)
+    # 12월 3일 -> 12.3
+    s = re.sub(r"(\d{1,2})\s*월\s*(\d{1,2})\s*일?", r"\1.\2", s)
+
+    # -, / 를 . 로 통일
+    s = s.replace("-", ".").replace("/", ".")
+
+    # 점 주변 공백 / 중복 점 정리
+    s = re.sub(r"\s*\.\s*", ".", s)
+    s = re.sub(r"\.+", ".", s)
+    s = s.strip(" .")
+
+    # 1) YYYY.MM.DD
     m = re.match(r"^(\d{4})\.(\d{1,2})\.(\d{1,2})$", s)
     if m:
         y, mth, d = map(int, m.groups())
@@ -47,7 +65,7 @@ def parse_single_date(part: str, base_date: datetime | None = None) -> datetime 
         except ValueError:
             return None
 
-    # 2) MM.DD 형식 (연도는 base_date에서 가져오기)
+    # 2) MM.DD (연도는 base_date 기준)
     if base_date:
         m = re.match(r"^(\d{1,2})\.(\d{1,2})$", s)
         if m:
@@ -57,7 +75,7 @@ def parse_single_date(part: str, base_date: datetime | None = None) -> datetime 
             except ValueError:
                 return None
 
-    # 3) DD 형식 (연/월은 base_date에서 가져오기)
+    # 3) DD (연/월은 base_date 기준)
     if base_date:
         m = re.match(r"^(\d{1,2})$", s)
         if m:
@@ -74,35 +92,45 @@ def parse_single_date(part: str, base_date: datetime | None = None) -> datetime 
 def parse_operating_day(operating_day: str):
     """
     예시:
-      '2025. 11. 26 - 2025. 12. 15'  -> ('2025-11-26', '2025-12-15')
-      '2025.12.3-12.8'               -> ('2025-12-03', '2025-12-08')
-      '2025.12.3 ~ 12.8'             -> ('2025-12-03', '2025-12-08')
-      '2025.12.3 ~ 2025.12.8'        -> ('2025-12-03', '2025-12-08')
-    실패 시: (원본 문자열, "")
+      '전시 기간: 2025. 11. 26 - 2025. 12. 15 (월요일 휴관)'
+      '2025.12.3-12.8'
+      '2025-12-03 ~ 2025-12-08'
+      '2025년 12월 3일 ~ 12월 8일'
+    -> ('YYYY-MM-DD', 'YYYY-MM-DD')
+    실패 시: (원본문자열, "")
     """
     if not operating_day:
         return "", ""
 
     text = operating_day.strip()
 
-    # ~, -, –(엔대시) 기준으로 앞/뒤 나누기 (한 번만 split)
+    # 1) 앞쪽의 "전시 기간:", "기간:" 등 제거 (첫 숫자부터 자르기)
+    m = re.search(r"\d", text)
+    if not m:
+        return text, ""
+    text = text[m.start():]
+
+    # 2) 괄호 안 설명 제거: "(월요일 휴관)" 같은 것
+    text = re.sub(r"\(.*?\)", "", text).strip()
+
+    # 3) ~, -, – 기준으로 앞/뒤 나누기
     parts = re.split(r"\s*[-~–]\s*", text, maxsplit=1)
+
     if len(parts) != 2:
-        # 형식 이상하면 그냥 통째로 start_date에 넣고 end_date는 빈 값
+        # 날짜 하나만 있을 수 있으니 한 번 시도
+        dt = parse_single_date(text)
+        if dt:
+            return dt.strftime("%Y-%m-%d"), ""
         return text, ""
 
     start_part, end_part = parts[0], parts[1]
 
-    # 앞 날짜 먼저 파싱
     start_dt = parse_single_date(start_part)
     if not start_dt:
-        # 시작 날짜도 못 읽으면 그냥 통째로 start_date
         return text, ""
 
-    # 뒤 날짜는 연/월이 없으면 앞 날짜 기준으로 보완
     end_dt = parse_single_date(end_part, base_date=start_dt)
     if not end_dt:
-        # 끝 날짜 못 읽으면 시작만 반환
         return start_dt.strftime("%Y-%m-%d"), ""
 
     return start_dt.strftime("%Y-%m-%d"), end_dt.strftime("%Y-%m-%d")
@@ -132,6 +160,30 @@ def parse_operating_hour(operating_hour: str):
     return open_time, close_time
 
 
+def to_date_or_none(s: str):
+    """'YYYY-MM-DD' -> date 객체, 실패 시 None"""
+    if not s:
+        return None
+    s = s.strip()
+    if len(s) != 10:
+        return None
+    try:
+        return datetime.strptime(s, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def to_time_or_none(s: str):
+    """'HH:MM' -> time 객체, 실패 시 None"""
+    if not s:
+        return None
+    s = s.strip()
+    try:
+        return datetime.strptime(s, "%H:%M").time()
+    except ValueError:
+        return None
+
+
 # ------------------------
 # GPT로 필드 추출하는 함수
 # ------------------------
@@ -151,7 +203,8 @@ def extract_fields_with_gpt(description_text: str, image_urls: list[str]) -> dic
   "description": "...",
   "imageUrl": "...",
   "operatingHour": "...",
-  "operatingDay": "..."
+  "operatingDay": "...",
+  "author": "..."
 }
 
 규칙:
@@ -159,8 +212,11 @@ def extract_fields_with_gpt(description_text: str, image_urls: list[str]) -> dic
 - description: 소개/설명 텍스트. 한국어로 자연스럽게.
 - imageUrl: 주어진 imageUrls 중에서 가장 대표 이미지 1개를 선택해서 그대로 넣기. 없다면 빈 문자열 "".
 - operatingHour: 관람 가능 시간 (예: "10:00 ~ 18:00").
-- operatingDay: 전시 기간이나 요일 정보 (예: "2025.01.01 ~ 2025.01.07", "월요일 휴관" 등 텍스트로 자연스럽게).
+- operatingDay: 전시 기간은 반드시 'YYYY.MM.DD ~ YYYY.MM.DD' 형식으로만 작성하세요.
+  (예: "2025.12.03 ~ 2025.12.08")
+- 필요하다면 요일/휴관 정보는 괄호 안에 추가해도 됩니다. (예: "2025.12.03 ~ 2025.12.08 (월요일 휴관)")
 - 반드시 유효한 JSON만 출력하고, 설명 문장이나 다른 텍스트는 출력하지 마세요.
+- 주어진 텍스트를 보고 작가를 추출해서 적어주세요. 없으면 ""로 둡니다.
 """
 
     user_content = {
@@ -169,7 +225,7 @@ def extract_fields_with_gpt(description_text: str, image_urls: list[str]) -> dic
     }
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",  # 필요에 따라 다른 모델명으로 변경 가능
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": system_prompt},
             {
@@ -186,7 +242,6 @@ def extract_fields_with_gpt(description_text: str, image_urls: list[str]) -> dic
     try:
         data = json.loads(raw)
     except json.JSONDecodeError:
-        # 혹시 JSON 포맷이 깨질 수 있으니 최소 방어 로직
         print("⚠ GPT 응답 JSON 파싱 실패. 원문:")
         print(raw)
         data = {
@@ -195,6 +250,7 @@ def extract_fields_with_gpt(description_text: str, image_urls: list[str]) -> dic
             "imageUrl": image_urls[0] if image_urls else "",
             "operatingHour": "",
             "operatingDay": "",
+            "author": "",
         }
 
     # key가 없을 수도 있으니 기본값 채우기
@@ -203,7 +259,7 @@ def extract_fields_with_gpt(description_text: str, image_urls: list[str]) -> dic
     data.setdefault("imageUrl", image_urls[0] if image_urls else "")
     data.setdefault("operatingHour", "")
     data.setdefault("operatingDay", "")
-    data.setdefault("galleryName", "")
+    data.setdefault("author", "")
 
     return data
 
@@ -286,32 +342,29 @@ def crawl_exhibitions():
             # (C) GPT에게 정보 추출 요청
             gpt_data = extract_fields_with_gpt(description_text, image_urls)
 
-            # (D) 날짜/시간 파싱
+            # (D) 날짜/시간 파싱 (GPT가 준 operatingDay/Hour는 여기까지만 사용)
             start_date, end_date = parse_operating_day(gpt_data["operatingDay"])
             open_time, close_time = parse_operating_hour(gpt_data["operatingHour"])
 
-            # (E) exhibition dict 구성
+            # (E) exhibition dict 구성 (operatingDay/Hour는 저장 안 함)
             ex.update({
                 "title": gpt_data["title"],
                 "description": gpt_data["description"],
-                # 전체 이미지 리스트
-                "imageUrl": image_urls,
-                # GPT가 선택한 대표 이미지(원하면 따로 쓸 수 있음)
-                "mainImageUrl": gpt_data["imageUrl"],
-                # 원본 텍스트 형태도 보존
-                "operatingHour": gpt_data["operatingHour"],
-                "operatingDay": gpt_data["operatingDay"],
-                # 파싱해서 나눈 필드들
+                "author": gpt_data["author"],
                 "start_date": start_date,
                 "end_date": end_date,
                 "open_time": open_time,
                 "close_time": close_time,
+                # 이미지: snake_case / camelCase 둘 다 넣어줌 (필요에 따라 사용)
+                "img_url": image_urls,
+                "imageUrl": image_urls,
+                "mainImageUrl": gpt_data["imageUrl"],
+                "gallery_name": "인사1010",
                 "galleryName": "인사1010",
+                "address": None,   # 지금은 주소 정보 없음
             })
 
             print(f"[상세] 제목: {ex['title']}")
-            print(f"[상세] 운영시간(raw): {ex['operatingHour']}")
-            print(f"[상세] 운영일(raw): {ex['operatingDay']}")
             print(f"[상세] start_date: {ex['start_date']}, end_date: {ex['end_date']}")
             print(f"[상세] open_time: {ex['open_time']}, close_time: {ex['close_time']}")
             print(f"[상세] 이미지 개수: {len(image_urls)}")
@@ -322,33 +375,133 @@ def crawl_exhibitions():
 
 
 # ------------------------
+# DB 저장 함수
+# ------------------------
+
+def save_to_postgres(exhibitions):
+    """
+    exhibition 테이블 구조 (다른 크롤러와 동일 가정):
+
+      id           BIGINT PK
+      title        VARCHAR(...) NOT NULL
+      description  VARCHAR(...) NOT NULL
+      address      VARCHAR(...)
+      author       VARCHAR(...) NOT NULL
+      start_date   DATE
+      end_date     DATE NOT NULL
+      open_time    TIME
+      close_time   TIME
+      views        INTEGER NOT NULL
+      img_url      VARCHAR(255)[] NOT NULL
+      gallery_name VARCHAR(...)
+      phone_num    VARCHAR(...)
+      created_at   DATE NOT NULL
+      modified_at  DATE
+    """
+    db_user = os.getenv("POSTGRES_USER", "pbl")
+    db_password = os.getenv("POSTGRES_PASSWORD", "1234")
+    db_name = os.getenv("POSTGRES_DB", "pbl")
+    db_host = os.getenv("POSTGRES_HOST", "3.34.46.99")  # 필요 시 변경
+    db_port = os.getenv("POSTGRES_PORT", "5432")
+
+    conn = None
+    try:
+        conn = psycopg2.connect(
+            dbname=db_name,
+            user=db_user,
+            password=db_password,
+            host=db_host,
+            port=db_port,
+        )
+        cur = conn.cursor()
+
+        insert_sql = """
+        INSERT INTO exhibition
+        (title, description, address,
+         author, start_date, end_date,
+         open_time, close_time,
+         views, img_url,
+         gallery_name, phone_num,
+         created_at, modified_at)
+        VALUES (%s, %s, %s,
+                %s, %s, %s,
+                %s, %s,
+                %s, %s,
+                %s, %s,
+                %s, %s)
+        """
+
+        today = date.today()
+
+        for ex in exhibitions:
+            start_dt = to_date_or_none(ex.get("start_date"))
+            end_dt = to_date_or_none(ex.get("end_date"))
+
+            # end_date NOT NULL → 없으면 스킵
+            if end_dt is None:
+                print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
+                continue
+
+            open_t = to_time_or_none(ex.get("open_time"))
+            close_t = to_time_or_none(ex.get("close_time"))
+
+            cur.execute(
+                insert_sql,
+                (
+                    ex.get("title") or "",
+                    ex.get("description") or "",
+                    ex.get("address"),
+                    ex.get("author") or "",
+                    start_dt,
+                    end_dt,
+                    open_t,
+                    close_t,
+                    0,                          # views 기본값 0
+                    ex.get("img_url", []),      # 배열 컬럼
+                    ex.get("gallery_name"),
+                    None,                       # phone_num (현재 없음)
+                    today,
+                    None,
+                ),
+            )
+
+        conn.commit()
+        print(f"[DB] exhibition 테이블에 {len(exhibitions)}개 INSERT 시도 완료")
+
+    except Exception as e:
+        print("[DB] 에러 발생:", e)
+        if conn:
+            conn.rollback()
+    finally:
+        if conn:
+            conn.close()
+
+
+# ------------------------
 # 메인 실행부
 # ------------------------
 
 if __name__ == "__main__":
-    # 크롤링 실행
+    # 1) 크롤링 실행
     data = crawl_exhibitions()
 
-    # Json 파일로 저장
-    output_path = "gallery_insaart_gpt.json"
+    # 2) JSON 파일로 저장 (디버깅/백업용)
+    output_path = "insa1010_gpt.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
     print(f"\nJSON 저장 완료: {output_path}")
     print(f"전시 개수: {len(data)}")
 
-    # 콘솔에 요약 출력
+    # 3) DB에 저장
+    save_to_postgres(data)
+
+    # 4) 콘솔에 간단 요약 출력
     for ex in data:
         print("\n==================== 전시 ====================")
         print("제목:", ex.get("title", ""))
-        print("운영시간(raw):", ex.get("operatingHour", ""))
-        print("운영일(raw):", ex.get("operatingDay", ""))
         print("start_date:", ex.get("start_date", ""))
         print("end_date:", ex.get("end_date", ""))
         print("open_time:", ex.get("open_time", ""))
         print("close_time:", ex.get("close_time", ""))
-        print("대표 이미지(mainImageUrl):", ex.get("mainImageUrl", ""))
-
-        print("\n[설명 텍스트]")
-        desc = ex.get("description", "")
-        print(desc[:500], "..." if len(desc) > 500 else "")
+        print("이미지 개수:", len(ex.get("img_url", [])))

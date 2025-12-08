@@ -1,5 +1,33 @@
 [
   {
+    "title": "Alive",
+    "subtitle": "Alive",
+    "operatingDay": "2025.12.10 - 2025.12.15",
+    "start_date": "2025-12-10",
+    "end_date": "2025-12-15",
+    "galleryName": "갤러리은",
+    "operatingHour": "AM 10:30 ~ PM 18:30(연중무휴)",
+    "open_time": "10:30",
+    "close_time": "18:30",
+    "imageUrl": [
+      "https://galleryeun.com/upload_dir/board/118596736669338e8596a6e.jpg",
+      "https://galleryeun.com/upload_dir/goods/41005522869338e030717b.jpg",
+      "https://galleryeun.com/upload_dir/goods/159629786869338dfcbc6eb.jpg",
+      "https://galleryeun.com/upload_dir/goods/199945091269338df796294.jpg",
+      "https://galleryeun.com/upload_dir/goods/51585757469338df2b7d99.jpg",
+      "https://galleryeun.com/upload_dir/goods/47289283769338ded77c3e.jpg",
+      "https://galleryeun.com/upload_dir/goods/139624285869338de800c84.jpg",
+      "https://galleryeun.com/upload_dir/goods/209380205769338de256d2e.jpg",
+      "https://galleryeun.com/upload_dir/goods/118025791569338ddd23389.jpg",
+      "https://galleryeun.com/upload_dir/goods/102721900069338dd76cca3.jpg",
+      "https://galleryeun.com/upload_dir/goods/25726244869338dd071e4f.jpg"
+    ],
+    "address": "서울 종로구 인사동길 45-1",
+    "description": "제 38회 경기대학교 예술체육대학 Fine Art학부 한국화전공 졸업작품전\n《Alive : 아름다움과 현대적인 감각이 살아 숨쉬다》\n\n\n제 38회 경기대학교 한국화과 졸업전시회에 여러분을 초대합니다.\n\n붓끝에 담긴 마음과 종이 위에 스민 시간.\n경기대학교 한국화과가 그동안의 배움에 결실을 맺고, 새롭게 펼쳐질 미래로 한 발자국 나아가는 여정을 선보입니다.\n\n이번 졸업 전시는 학생들이 전통적 재료와 기법을 바탕으로 현대의 감각과 개인의 사유를 더해 담아낸 작품들로, 각자의 개성과 세계를 종이 위에 꾹꾹 눌러담아 완성하였습니다.\n\n전통의 숨결 위에 오늘의 감각이 더해진 저희의 이야기와 함께 새롭게 시작될 경기대학교 한국화과 졸업생들의 첫 걸음을 함께해 주시길 바랍니다.",
+    "artistProfile": "",
+    "artist": "김보미, 김서은, 김채린, 김승연, 백서린, 서현욱, 이정은, 전이현, 정은지, 홍다인, 제 38회 경기대학교 예술체육대학 Fine Art학부 한국화전공 졸업작품전"
+  },
+  {
     "title": "푸르른 시간",
     "subtitle": "Blue Time",
     "operatingDay": "2025.12.03 - 2025.12.08",
@@ -7,10 +35,13 @@
     "end_date": "2025-12-08",
     "galleryName": "갤러리은",
     "operatingHour": "AM 10:30 ~ PM 18:30(연중무휴)",
-    "open_time": "AM 10:30",
-    "close_time": "PM 18:30",
+    "open_time": "10:30",
+    "close_time": "18:30",
     "imageUrl": [
       "https://galleryeun.com/upload_dir/board/993891387692a54a72d7ef.jpg",
+      "https://galleryeun.com/upload_dir/goods/756183722693132c98d2e0.png",
+      "https://galleryeun.com/upload_dir/goods/1366111798693132c5eac88.png",
+      "https://galleryeun.com/upload_dir/goods/579933444693132c027fff.png",
       "https://galleryeun.com/upload_dir/goods/165010516692a5394698d8.jpg",
       "https://galleryeun.com/upload_dir/goods/399444425692a538f5aa4c.jpg",
       "https://galleryeun.com/upload_dir/goods/727970210692a5387b9ea0.jpg"
@@ -18,7 +49,7 @@
     "address": "서울 종로구 인사동길 45-1",
     "description": "2th 프로젝트 「깔」 정기회원전\n《푸르른 시간》\n\n\n전시 서문\n\n각기 다른 색을 지닌\n전통의 맥에 현대를 더해\n뻔하지 않고 fun하게\n유쾌한 발상을 해학으로\n다양한 표현기법을 통해 자유롭게 펼치는 행복의 시간\n그 행복의 시간은 어쩌면 찰나입니다.\n\n크고 작게, 길고 짧게 간직하고 있던 그 시간들, 일상 속에서 스치듯 지나가는 행복한 순간들을, 10인의 작가들은 미쳐 놓쳐버린 그런 시간들을 찾아 공유하고 싶습니다.\n이번 전시될 작가들과 작품들은 환상과 몽환이 깃든 색감,\n은은한 이야기,\n발직한 웃음을 담은 작품으로 선정하였습니다.\n전시를 통해 치유와 정서적 안정을 꾀할 수 있는 공간이길 희망하며, 복잡한 감정들을 해소하고, 잠시나마 질병에 대한 두려움에서 벗어나 긍정적인 에너지를 통해 치유에 조금이나마 기여하고 싶습니다.\n작가가 표현하는 다양한 행복의 모습을 각자의 ‘시간’이라는 형태를 통해 메시지를 전달하며, 함께 하고 싶습니다.",
     "artistProfile": "",
-    "artist": "우정민_고요, 우정민_잠시, 꽃과나비2_object, 김정순, 맹용선, 손미경, 신미숙, 양해연, 오시은, 우정민, 유은정, 이희경, 황지영, 2th 프로젝트 「깔」 정기회원전"
+    "artist": "전시전경, 우정민_고요, 우정민_잠시, 꽃과나비2_object, 김정순, 맹용선, 손미경, 신미숙, 양해연, 오시은, 우정민, 유은정, 이희경, 황지영, 2th 프로젝트 「깔」 정기회원전"
   },
   {
     "title": "민화속에서 꿈꾸다",
@@ -28,10 +59,15 @@
     "end_date": "2025-12-08",
     "galleryName": "갤러리은",
     "operatingHour": "AM 10:30 ~ PM 18:30(연중무휴)",
-    "open_time": "AM 10:30",
-    "close_time": "PM 18:30",
+    "open_time": "10:30",
+    "close_time": "18:30",
     "imageUrl": [
       "https://galleryeun.com/upload_dir/board/739042054692a543a98463.jpeg",
+      "https://galleryeun.com/upload_dir/goods/1321366151693132ea2e134.jpg",
+      "https://galleryeun.com/upload_dir/goods/1728946795693132e64d499.jpg",
+      "https://galleryeun.com/upload_dir/goods/620762088693132e26727d.png",
+      "https://galleryeun.com/upload_dir/goods/1529406126693132d93bfba.png",
+      "https://galleryeun.com/upload_dir/goods/856261761693132d489ebb.jpg",
       "https://galleryeun.com/upload_dir/goods/1525786039692a53405abf6.jpg",
       "https://galleryeun.com/upload_dir/goods/2082914781692a5332e5df9.jpg",
       "https://galleryeun.com/upload_dir/goods/318397776692a532c220e2.jpg",
@@ -41,6 +77,6 @@
     "address": "서울 종로구 인사동길 45-1",
     "description": "제 4회 금송민화 회원전 《민화속에서 꿈꾸다》\n\n\n전시 서문\n\n한국 민화명장인 이영덕 선생님을 위시하여 10년 이상 선생님의 지도하에 함께한 민화작가들의 금송민화회전입니다.\n민화의 아름다움과, 작가가 추구하는 내면이 만나 한지위에 표현함으로써, 나와 민화가 재탄생하는 즐거움을 이번 금송회전을 통하여 모두의 즐거움으로 만끽하고자, 한자리에 모여 전시를 열게 되었습니다\n\n\n전시 이력\n\n2018. 금송민화회 1회 회원전(갤러리 is)\n2021. 금송민화회 2회 회원전(라메르 갤러리)\n2022. 금송민화회 회원전(서울무역전시관 1관)\n2023. 금송민화회 3회 회원전(갤러리 인사아트)",
     "artistProfile": "",
-    "artist": "김명주, 김선옥, 안미옥, 박상옥, 김영기, 제 4회 금송민화 회원전 《민화속에서 꿈꾸다》"
+    "artist": "전시전경, 김명주, 김선옥, 안미옥, 박상옥, 김영기, 제 4회 금송민화 회원전 《민화속에서 꿈꾸다》"
   }
 ]

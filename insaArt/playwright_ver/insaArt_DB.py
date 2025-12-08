@@ -2,7 +2,7 @@ from urllib.parse import urljoin
 from playwright.sync_api import sync_playwright
 import json
 import re
-from datetime import datetime, date
+from datetime import datetime, date, time
 import os
 
 import psycopg2  # PostgreSQL 연동용
@@ -95,20 +95,22 @@ def parse_operating_day(operating_day: str):
 def parse_operating_hour(operating_hour: str):
     """
     예시: 'AM 10:00 ~ PM 19:00(화요일 정기 휴무)'
-    -> ('AM 10:00', 'PM 19:00')
-    (컬럼이 TEXT/VARCHAR 라고 가정하고 문자열 그대로 넣음)
+    -> ('10:00', '19:00')  # HH:MM 형식으로 반환 (TIME 컬럼용)
     """
     if not operating_hour:
         return "", ""
 
+    # 괄호 뒤 설명 제거
     base = operating_hour.split("(", 1)[0].strip()
-    parts = [p.strip() for p in base.split("~")]
-    if len(parts) != 2:
-        return base, ""
+    # HH:MM 패턴만 뽑기
+    times = re.findall(r"\d{1,2}:\d{2}", base)
 
-    open_time = parts[0]
-    close_time = parts[1]
-    return open_time, close_time
+    if len(times) >= 2:
+        return times[0], times[1]
+    elif len(times) == 1:
+        return times[0], ""
+    else:
+        return "", ""
 
 
 def to_date_or_none(s: str):
@@ -120,6 +122,17 @@ def to_date_or_none(s: str):
         return None
     try:
         return datetime.strptime(s, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def to_time_or_none(s: str):
+    """'HH:MM' 형식 문자열을 time 객체로 변환, 아니면 None"""
+    if not s:
+        return None
+    s = s.strip()
+    try:
+        return datetime.strptime(s, "%H:%M").time()
     except ValueError:
         return None
 
@@ -170,7 +183,7 @@ def crawl_exhibitions():
             # operating_day → start_date / end_date
             start_date, end_date = parse_operating_day(operating_day)
 
-            # 운영시간 고정값 → open_time / close_time
+            # 운영시간 고정값 → open_time / close_time (HH:MM)
             operating_hour = "AM 10:00 ~ PM 19:00(화요일 정기 휴무)"
             open_time, close_time = parse_operating_hour(operating_hour)
 
@@ -180,12 +193,12 @@ def crawl_exhibitions():
                     "start_date": start_date,
                     "end_date": end_date,
                     "address": hall,
-                    "galleryName": gallery_txt or "인사아트센터",
+                    "gallery_name": gallery_txt or "인사아트센터",
                     "open_time": open_time,
                     "close_time": close_time,
-                    "artist": "",
+                    "author": "",         # 작가 이름 (상세에서 채움)
                     "description": "",
-                    "img_url": [],   # ← snake_case로 사용
+                    "img_url": [],        # 배열 컬럼에 들어갈 리스트
                 }
             )
 
@@ -262,11 +275,12 @@ def crawl_exhibitions():
 
                 image_urls.append(src)
 
+            # 중복 제거
             image_urls = list(dict.fromkeys(image_urls))
 
-            ex["artist"] = artist
+            ex["author"] = artist
             ex["description"] = description
-            ex["img_url"] = image_urls   # ← 여기서도 image_url 로 통일
+            ex["img_url"] = image_urls
 
             print(f"[상세] 이미지 개수: {len(image_urls)}")
 
@@ -281,22 +295,23 @@ def crawl_exhibitions():
 
 def save_to_postgres(exhibitions):
     """
-    exhibition 테이블 예시 스키마 (가정):
+    exhibition 테이블 구조(갤러리 인사아트 코드와 동일 가정):
 
+      id           BIGINT PK (auto increment)
       title        VARCHAR(...) NOT NULL
       description  VARCHAR(...) NOT NULL
       address      VARCHAR(...)
       author       VARCHAR(...) NOT NULL
       start_date   DATE
       end_date     DATE NOT NULL
-      open_time    TEXT (또는 TIME)
-      close_time   TEXT (또는 TIME)
+      open_time    TIME
+      close_time   TIME
       views        INTEGER NOT NULL
-      img_url    VARCHAR(255)[] NOT NULL   -- 배열 타입이라고 가정
-      galleryName  VARCHAR(...)
-      phoneNum     VARCHAR(...)
-      createdAt    DATE NOT NULL
-      modifiedAt   DATE
+      img_url      VARCHAR(255)[] NOT NULL
+      gallery_name VARCHAR(...)
+      phone_num    VARCHAR(...)
+      created_at   DATE NOT NULL
+      modified_at  DATE
     """
     db_user = os.getenv("POSTGRES_USER", "pbl")
     db_password = os.getenv("POSTGRES_PASSWORD", "1234")
@@ -321,8 +336,8 @@ def save_to_postgres(exhibitions):
          author, start_date, end_date,
          open_time, close_time,
          views, img_url,
-         "galleryName", "phoneNum",
-         "createdAt", "modifiedAt")
+         gallery_name, phone_num,
+         created_at, modified_at)
         VALUES (%s, %s, %s,
                 %s, %s, %s,
                 %s, %s,
@@ -342,21 +357,24 @@ def save_to_postgres(exhibitions):
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
                 continue
 
+            open_t = to_time_or_none(ex.get("open_time"))
+            close_t = to_time_or_none(ex.get("close_time"))
+
             cur.execute(
                 insert_sql,
                 (
                     ex.get("title") or "",
                     ex.get("description") or "",
                     ex.get("address"),
-                    ex.get("artist") or "",
+                    ex.get("author") or "",
                     start_dt,
                     end_dt,
-                    ex.get("open_time") or None,
-                    ex.get("close_time") or None,
-                    0,                              # views 기본 0
-                    ex.get("img_url", []),        # image_url: 리스트 그대로
-                    ex.get("galleryName"),
-                    None,                           # phoneNum
+                    open_t,
+                    close_t,
+                    0,                         # views 기본값 0
+                    ex.get("img_url", []),     # img_url: 배열 컬럼 가정
+                    ex.get("gallery_name"),
+                    None,                      # phone_num: 아직 없음
                     today,
                     None,
                 ),

@@ -2,8 +2,10 @@ import re
 import json
 import time
 from urllib.parse import urljoin
-from datetime import datetime
+from datetime import datetime, date
 from playwright.sync_api import sync_playwright
+import os
+import psycopg2  # PostgreSQL 연동용
 
 # 1. 갤러리은 리스트 페이지 (전시 목록이 있는 게시판/메인)
 # 만약 메인 페이지에 슬라이더가 있다면 "https://galleryeun.com/index.php" 사용
@@ -104,22 +106,46 @@ def parse_operating_hour(operating_hour: str):
       '10:00 ~ 18:00'
       '10:00-18:00'
       '10:00 – 18:00(월요일 휴관)'
-    -> ('AM 10:30', 'PM 18:30') 또는 ('10:00', '18:00')
+    -> ('10:30', '18:30') 또는 ('10:00', '18:00')  # HH:MM 형태로 반환
     """
     if not operating_hour:
         return "", ""
 
     # 괄호 뒤 설명 제거
     base = operating_hour.split("(", 1)[0].strip()
-    # ~, -, – 기준으로 쪼개기
-    parts = re.split(r"\s*[-~–]\s*", base)
-    if len(parts) != 2:
-        # 쪼개기 실패하면 전체를 open_time으로만 사용
-        return base, ""
+    # 문자열에서 HH:MM 패턴만 추출
+    times = re.findall(r"\d{1,2}:\d{2}", base)
 
-    open_time = parts[0].strip()
-    close_time = parts[1].strip()
-    return open_time, close_time
+    if len(times) >= 2:
+        return times[0], times[1]
+    elif len(times) == 1:
+        return times[0], ""
+    else:
+        return "", ""
+
+
+def to_date_or_none(s: str):
+    """'YYYY-MM-DD' -> date 객체, 실패 시 None"""
+    if not s:
+        return None
+    s = s.strip()
+    if len(s) != 10:
+        return None
+    try:
+        return datetime.strptime(s, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def to_time_or_none(s: str):
+    """'HH:MM' -> time 객체, 실패 시 None"""
+    if not s:
+        return None
+    s = s.strip()
+    try:
+        return datetime.strptime(s, "%H:%M").time()
+    except ValueError:
+        return None
 
 
 # ==============================
@@ -207,13 +233,13 @@ def crawl_exhibitions():
             exhibitions.append({
                 "title": title_kr,
                 "subtitle": subtitle,
-                "operatingDay": operating_day,           # raw
+                "operatingDay": operating_day,           # raw (지금은 안 씀)
                 "start_date": start_date,               # 파싱 후
                 "end_date": end_date,
                 "detailUrl": detail_url,
                 "galleryName": "갤러리은",
-                "operatingHour": operating_hour,        # raw
-                "open_time": open_time,                 # 파싱 후
+                "operatingHour": operating_hour,        # raw (지금은 안 씀)
+                "open_time": open_time,                 # 'HH:MM'
                 "close_time": close_time,
                 "imageUrl": [thumb_url] if thumb_url else [],
                 # 상세 페이지에서 채울 값들
@@ -376,19 +402,130 @@ def crawl_exhibitions():
         return exhibitions
 
 
+# ==============================
+# DB 저장 함수
+# ==============================
+
+def save_to_postgres(exhibitions):
+    """
+    exhibition 테이블 구조 (다른 크롤러와 동일 가정):
+
+      id           BIGINT PK
+      title        VARCHAR(...) NOT NULL
+      description  VARCHAR(...) NOT NULL
+      address      VARCHAR(...)
+      author       VARCHAR(...) NOT NULL
+      start_date   DATE
+      end_date     DATE NOT NULL
+      open_time    TIME
+      close_time   TIME
+      views        INTEGER NOT NULL
+      img_url      VARCHAR(255)[] NOT NULL
+      gallery_name VARCHAR(...)
+      phone_num    VARCHAR(...)
+      created_at   DATE NOT NULL
+      modified_at  DATE
+    """
+    db_user = os.getenv("POSTGRES_USER", "pbl")
+    db_password = os.getenv("POSTGRES_PASSWORD", "1234")
+    db_name = os.getenv("POSTGRES_DB", "pbl")
+    db_host = os.getenv("POSTGRES_HOST", "3.34.46.99")  # 필요 시 변경
+    db_port = os.getenv("POSTGRES_PORT", "5432")
+
+    conn = None
+    try:
+        conn = psycopg2.connect(
+            dbname=db_name,
+            user=db_user,
+            password=db_password,
+            host=db_host,
+            port=db_port,
+        )
+        cur = conn.cursor()
+
+        insert_sql = """
+        INSERT INTO exhibition
+        (title, description, address,
+         author, start_date, end_date,
+         open_time, close_time,
+         views, img_url,
+         gallery_name, phone_num,
+         created_at, modified_at)
+        VALUES (%s, %s, %s,
+                %s, %s, %s,
+                %s, %s,
+                %s, %s,
+                %s, %s,
+                %s, %s)
+        """
+
+        today = date.today()
+
+        for ex in exhibitions:
+            start_dt = to_date_or_none(ex.get("start_date"))
+            end_dt = to_date_or_none(ex.get("end_date"))
+
+            # end_date NOT NULL → 없으면 스킵
+            if end_dt is None:
+                print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
+                continue
+
+            open_t = to_time_or_none(ex.get("open_time"))
+            close_t = to_time_or_none(ex.get("close_time"))
+
+            cur.execute(
+                insert_sql,
+                (
+                    ex.get("title") or "",
+                    ex.get("description") or "",
+                    ex.get("address"),
+                    ex.get("artist") or "",           # author = artist 문자열
+                    start_dt,
+                    end_dt,
+                    open_t,
+                    close_t,
+                    0,                                # views 기본값 0
+                    ex.get("imageUrl", []),           # 배열 컬럼
+                    ex.get("galleryName"),
+                    None,                             # phone_num
+                    today,
+                    None,
+                ),
+            )
+
+        conn.commit()
+        print(f"[DB] exhibition 테이블에 {len(exhibitions)}개 INSERT 시도 완료")
+
+    except Exception as e:
+        print("[DB] 에러 발생:", e)
+        if conn:
+            conn.rollback()
+    finally:
+        if conn:
+            conn.close()
+
+
+# ==============================
+# 메인 실행부
+# ==============================
+
 if __name__ == "__main__":
     data = crawl_exhibitions()
 
     if data:
+        # 1) JSON 저장 (백업/디버깅용)
         output_path = "galleryEun.json"
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
-        print(f"\n========= 저장 완료 =========")
+        print(f"\n========= JSON 저장 완료 =========")
         print(f"파일 위치: {output_path}")
         print(f"총 데이터 개수: {len(data)}")
         
-        # 확인용 출력 (첫 번째 데이터)
+        # 2) DB 저장
+        save_to_postgres(data)
+
+        # 3) 확인용 출력 (첫 번째 데이터)
         print("\n[첫 번째 데이터 샘플]")
         print(f"제목: {data[0].get('title')}")
         print(f"작가: {data[0].get('artist')}")
