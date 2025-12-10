@@ -32,6 +32,11 @@ Course repository for the Fall 2025 Project-Based Learning (PBL) class.
 - [x] **인사아트 (Insa Art)**
 - [x] **마루아트센터 (Maru Art Center)**
 - [x] **통인 갤러리 (Tongin Gallery)**
+- [x] **갤러리 밈 (Gallery MEME)**
+- [x] **올미아트스페이스 (All Me Art Space)**
+- [x] **노화랑 (Rho Gallery)**
+- [x] **서울 노인 복지센터 (Seoul Noin)**
+- [x] **선화랑 (Sun Gallery)**
 
 ## 🚀 Installation & Setup
 

@@ -353,8 +353,8 @@ def crawl_exhibitions():
                 "author": gpt_data["author"],
                 "start_date": start_date,
                 "end_date": end_date,
-                "open_time": open_time,
-                "close_time": close_time,
+                "open_time": "11:00",
+                "close_time": "19:00",
                 # 이미지: snake_case / camelCase 둘 다 넣어줌 (필요에 따라 사용)
                 "img_url": image_urls,
                 "imageUrl": image_urls,
