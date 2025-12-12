@@ -13,6 +13,16 @@ LIST_URL = "https://www.insaartcenter.com/bbs/board.php?bo_table=exhibition_curr
 
 
 # ==============================
+# 공백 제거 유틸 (✅ 추가)
+# ==============================
+def normalize_text(s: str) -> str:
+    """None 또는 공백만 있는 텍스트를 빈 문자열로 정리"""
+    if not s:
+        return ""
+    return s.strip()
+
+
+# ==============================
 # 날짜/시간 파싱 유틸 함수들
 # ==============================
 
@@ -296,27 +306,11 @@ def crawl_exhibitions():
 def save_to_postgres(exhibitions):
     """
     exhibition 테이블 구조(갤러리 인사아트 코드와 동일 가정):
-
-      id           BIGINT PK (auto increment)
-      title        VARCHAR(...) NOT NULL
-      description  VARCHAR(...) NOT NULL
-      address      VARCHAR(...)
-      author       VARCHAR(...) NOT NULL
-      start_date   DATE
-      end_date     DATE NOT NULL
-      open_time    TIME
-      close_time   TIME
-      views        INTEGER NOT NULL
-      img_url      VARCHAR(255)[] NOT NULL
-      gallery_name VARCHAR(...)
-      phone_num    VARCHAR(...)
-      created_at   DATE NOT NULL
-      modified_at  DATE
     """
     db_user = os.getenv("POSTGRES_USER", "pbl")
     db_password = os.getenv("POSTGRES_PASSWORD", "1234")
     db_name = os.getenv("POSTGRES_DB", "pbl")
-    db_host = os.getenv("POSTGRES_HOST", "3.34.46.99")  # 필요하면 localhost 등으로 변경
+    db_host = os.getenv("POSTGRES_HOST", "api.insa-exhibition.shop")
     db_port = os.getenv("POSTGRES_PORT", "5432")
 
     conn = None
@@ -357,6 +351,12 @@ def save_to_postgres(exhibitions):
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
                 continue
 
+            # ✅ description 비어있으면 스킵
+            desc = normalize_text(ex.get("description") or "")
+            if not desc:
+                print(f"[DB] description 없음, 스킵: {ex.get('title')}")
+                continue
+
             open_t = to_time_or_none(ex.get("open_time"))
             close_t = to_time_or_none(ex.get("close_time"))
 
@@ -364,17 +364,17 @@ def save_to_postgres(exhibitions):
                 insert_sql,
                 (
                     ex.get("title") or "",
-                    ex.get("description") or "",
+                    desc,  # ✅ 정리된 description 사용
                     ex.get("address"),
                     ex.get("author") or "",
                     start_dt,
                     end_dt,
                     open_t,
                     close_t,
-                    0,                         # views 기본값 0
-                    ex.get("img_url", []),     # img_url: 배열 컬럼 가정
+                    0,
+                    ex.get("img_url", []),
                     ex.get("gallery_name"),
-                    None,                      # phone_num: 아직 없음
+                    None,
                     today,
                     None,
                 ),

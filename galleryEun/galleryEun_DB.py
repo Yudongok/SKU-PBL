@@ -148,6 +148,13 @@ def to_time_or_none(s: str):
         return None
 
 
+def normalize_text(s: str) -> str:
+    """None/공백/줄바꿈 정리해서 의미 있는 텍스트만 남김"""
+    if not s:
+        return ""
+    return s.strip()
+
+
 # ==============================
 # 크롤러 본체
 # ==============================
@@ -164,7 +171,7 @@ def crawl_exhibitions():
         try:
             page.goto(LIST_URL, timeout=60_000)
             page.wait_for_load_state("domcontentloaded")
-            
+
             # 슬라이더가 로딩될 때까지 대기
             try:
                 page.wait_for_selector(".slick-list .slick-slide", timeout=5000)
@@ -179,7 +186,7 @@ def crawl_exhibitions():
             return []
 
         exhibitions = []
-        
+
         # 가짜(cloned) 슬라이드 제외하고 진짜만 선택
         slides = page.locator(".slick-list .slick-slide:not(.slick-cloned)")
         count = slides.count()
@@ -187,12 +194,12 @@ def crawl_exhibitions():
 
         for i in range(count):
             slide = slides.nth(i)
-            
+
             # (1) 링크
             link_el = slide.locator("a").first
             if not link_el.count():
                 continue
-            
+
             href = link_el.get_attribute("href") or ""
             detail_url = urljoin(LIST_URL, href)
 
@@ -274,7 +281,7 @@ def crawl_exhibitions():
             # (1) 이미지 수집 (style 속성의 url 추출)
             # ---------------------------------------------------------
             detail_images = ex["imageUrl"][:]  # 썸네일 포함
-            
+
             # A. 상단 대표 이미지 (.ex_li .img_dummy)
             hero_imgs = page.locator(".ex_li .img_dummy").all()
             for el in hero_imgs:
@@ -313,11 +320,9 @@ def crawl_exhibitions():
                 a_g = gallery_blocks.nth(i_g)
                 title_attr = (a_g.get_attribute("title") or "").strip()
                 if title_attr:
-                    # "김명주, 책가도-사유의 꽃, ..." -> "김명주"
                     first_part = title_attr.split(",")[0].strip()
                     add_artist_name(first_part)
 
-                # a.gallery 다음에 오는 <a><p>텍스트도 참고
                 p_el = a_g.locator("xpath=./following-sibling::a[1]/p")
                 if p_el.count():
                     p_text = p_el.inner_text().strip()
@@ -328,7 +333,7 @@ def crawl_exhibitions():
             # (3) 텍스트 수집 및 분리 (서문 vs 프로필, 참여 작가)
             # ---------------------------------------------------------
             text_container = page.locator(".t_st2").first
-            
+
             description = ""
             profile = ""
             artist_section_text = ""
@@ -362,23 +367,20 @@ def crawl_exhibitions():
 
                 # 3-3) '참여 작가'에서 이름들 파싱
                 if "참여 작가" in full_text and not artist_section_text:
-                    # 혹시 위에서 못 잘랐으면 full_text 기준으로 다시
                     _, artist_section_text = full_text.split("참여 작가", 1)
 
                 if artist_section_text:
                     lines_after = [ln.strip() for ln in artist_section_text.splitlines() if ln.strip()]
                     if lines_after:
-                        # 여러 줄에 나뉘어 있을 수도 있으니 전부 이어서 쉼표 기준으로 분리
                         joined = " ".join(lines_after)
                         for cand in re.split(r"[、,]", joined):
                             add_artist_name(cand)
 
-                # 3-4) fallback: 첫 줄이 "OOO 개인전" / "OOO 초대전" 형태일 수 있음
+                # 3-4) fallback: 첫 줄이 "OOO 개인전" / "OOO 초대전"
                 lines = [line.strip() for line in full_text.splitlines() if line.strip()]
                 if lines:
                     first_line = lines[0]
                     fallback_name = first_line.replace("개인전", "").replace("초대전", "").strip()
-                    # 이미 artist_list에 있으면 add_artist_name에서 중복 체크됨
                     add_artist_name(fallback_name)
 
             ex["description"] = description
@@ -408,28 +410,12 @@ def crawl_exhibitions():
 
 def save_to_postgres(exhibitions):
     """
-    exhibition 테이블 구조 (다른 크롤러와 동일 가정):
-
-      id           BIGINT PK
-      title        VARCHAR(...) NOT NULL
-      description  VARCHAR(...) NOT NULL
-      address      VARCHAR(...)
-      author       VARCHAR(...) NOT NULL
-      start_date   DATE
-      end_date     DATE NOT NULL
-      open_time    TIME
-      close_time   TIME
-      views        INTEGER NOT NULL
-      img_url      VARCHAR(255)[] NOT NULL
-      gallery_name VARCHAR(...)
-      phone_num    VARCHAR(...)
-      created_at   DATE NOT NULL
-      modified_at  DATE
+    exhibition 테이블 구조 (다른 크롤러와 동일 가정)
     """
     db_user = os.getenv("POSTGRES_USER", "pbl")
     db_password = os.getenv("POSTGRES_PASSWORD", "1234")
     db_name = os.getenv("POSTGRES_DB", "pbl")
-    db_host = os.getenv("POSTGRES_HOST", "3.34.46.99")  # 필요 시 변경
+    db_host = os.getenv("POSTGRES_HOST", "api.insa-exhibition.shop")  # 필요 시 변경
     db_port = os.getenv("POSTGRES_PORT", "5432")
 
     conn = None
@@ -461,13 +447,25 @@ def save_to_postgres(exhibitions):
 
         today = date.today()
 
+        inserted = 0
+        skipped_no_end_date = 0
+        skipped_no_description = 0
+
         for ex in exhibitions:
             start_dt = to_date_or_none(ex.get("start_date"))
             end_dt = to_date_or_none(ex.get("end_date"))
 
             # end_date NOT NULL → 없으면 스킵
             if end_dt is None:
+                skipped_no_end_date += 1
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
+                continue
+
+            # ✅ description이 한 글자도 없으면(공백 포함) 스킵
+            desc = normalize_text(ex.get("description") or "")
+            if not desc:
+                skipped_no_description += 1
+                print(f"[DB] description 비어있음, 스킵: {ex.get('title')}")
                 continue
 
             open_t = to_time_or_none(ex.get("open_time"))
@@ -477,24 +475,25 @@ def save_to_postgres(exhibitions):
                 insert_sql,
                 (
                     ex.get("title") or "",
-                    ex.get("description") or "",
+                    desc,                           # 정리된 desc 사용
                     ex.get("address"),
-                    ex.get("artist") or "",           # author = artist 문자열
+                    ex.get("artist") or "",         # author = artist 문자열
                     start_dt,
                     end_dt,
                     open_t,
                     close_t,
-                    0,                                # views 기본값 0
-                    ex.get("imageUrl", []),           # 배열 컬럼
+                    0,
+                    ex.get("imageUrl", []),
                     ex.get("galleryName"),
-                    None,                             # phone_num
+                    None,
                     today,
                     None,
                 ),
             )
+            inserted += 1
 
         conn.commit()
-        print(f"[DB] exhibition 테이블에 {len(exhibitions)}개 INSERT 시도 완료")
+        print(f"[DB] INSERT 성공: {inserted}건 / end_date 없음 스킵: {skipped_no_end_date}건 / description 없음 스킵: {skipped_no_description}건")
 
     except Exception as e:
         print("[DB] 에러 발생:", e)
@@ -521,7 +520,7 @@ if __name__ == "__main__":
         print(f"\n========= JSON 저장 완료 =========")
         print(f"파일 위치: {output_path}")
         print(f"총 데이터 개수: {len(data)}")
-        
+
         # 2) DB 저장
         save_to_postgres(data)
 

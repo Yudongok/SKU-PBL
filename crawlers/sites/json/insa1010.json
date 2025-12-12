@@ -1,7 +1,7 @@
 [
   {
     "title": "박지은 개인전 < Re 순환의고리 >",
-    "description": "박지은의 개인전 < Re 순환의고리 >는 자연의 순환과 반복의 본질을 탐구하는 작품으로, 손의 움직임을 통해 내면의 성찰과 회복의 과정을 담아냅니다. 전시는 2025년 12월 10일부터 12월 15일까지 진행되며, 무료로 관람할 수 있습니다. 화요일은 설치 철수로 인해 관람이 불가합니다.",
+    "description": "박지은의 개인전 < Re 순환의고리 >는 2025년 12월 10일부터 12월 15일까지 서울 인사동 H관에서 열립니다. 전시는 자연의 순환과 반복의 리듬을 통해 자기 성찰과 회복의 과정을 탐구하며, 손의 움직임을 통해 삶의 순간들을 작품에 담아냅니다.",
     "author": "박지은",
     "start_date": "2025-12-10",
     "end_date": "2025-12-15",
@@ -13,15 +13,7 @@
       "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/cbfedda8bb07e.jpg",
       "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/734fe53c5cf51.jpg"
     ],
-    "imageUrl": [
-      "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/3966fcb1e969e.jpg",
-      "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/596c4c2e0a6b2.jpg",
-      "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/cbfedda8bb07e.jpg",
-      "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/734fe53c5cf51.jpg"
-    ],
-    "mainImageUrl": "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/3966fcb1e969e.jpg",
     "gallery_name": "인사1010",
-    "galleryName": "인사1010",
     "address": null
   },
   {
@@ -38,15 +30,7 @@
       "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/a3260ab009f0c.jpg",
       "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/170ce27aa6697.jpg"
     ],
-    "imageUrl": [
-      "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/0baaec900567b.jpg",
-      "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/cd93e2862bfc3.jpg",
-      "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/a3260ab009f0c.jpg",
-      "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/170ce27aa6697.jpg"
-    ],
-    "mainImageUrl": "https://cdn.imweb.me/upload/S2022102952fd3b83b97f7/0baaec900567b.jpg",
     "gallery_name": "인사1010",
-    "galleryName": "인사1010",
     "address": null
   }
 ]

@@ -28,10 +28,10 @@ def parse_date_range(text: str):
     """
     if not text:
         return None, None
-    
+
     # 공백 제거 및 정리
     text = text.replace("&nbsp;", " ").strip()
-    
+
     # 정규식: YYYY-MM-DD ~ YYYY-MM-DD
     pattern = r"(\d{4})[-.](\d{1,2})[-.](\d{1,2})\s*[-~]\s*(\d{4})[-.](\d{1,2})[-.](\d{1,2})"
     m = re.search(pattern, text)
@@ -43,18 +43,27 @@ def parse_date_range(text: str):
             return dt1, dt2
         except ValueError:
             pass
-            
+
     return None, None
 
+
 def to_time_or_none(s):
-    if not s: return None
-    try: return datetime.strptime(s, "%H:%M").time()
-    except: return None
+    if not s:
+        return None
+    try:
+        return datetime.strptime(s, "%H:%M").time()
+    except:
+        return None
+
 
 def to_date_or_none(s):
-    if not s: return None
-    try: return datetime.strptime(s, "%Y-%m-%d").date()
-    except: return None
+    if not s:
+        return None
+    try:
+        return datetime.strptime(s, "%Y-%m-%d").date()
+    except:
+        return None
+
 
 # ==============================
 # 크롤러 본체
@@ -99,26 +108,21 @@ def crawl_seoulnoin_single_page():
             print("  [경고] 날짜 태그(.smInfo1 li.point) 미발견")
 
         # ---------------------------------------------------------
-        # 3. 설명(Description) 파싱 (수정됨)
-        # 요청사항: <div class="first_title">전시요약</div> 의 "다음 다음 div"
+        # 3. 설명(Description) 파싱
+        # <div class="first_title">전시요약</div> 의 "다음 다음 div"
         # ---------------------------------------------------------
         description = ""
-        
-        # (1) "전시요약" 텍스트를 가진 div.first_title 찾기
+
         summary_title = page.locator("div.first_title", has_text="전시요약")
-        
+
         if summary_title.count():
-            # (2) XPath를 사용하여 해당 요소의 "다음 다음 형제 div" ([2])를 선택
-            # following-sibling::div[2] -> 현재 요소 뒤에 나오는 div 중 2번째 것
             target_div = summary_title.locator("xpath=following-sibling::div[2]")
-            
+
             if target_div.count():
                 raw_text = target_div.inner_text()
-                # 텍스트 정제 (불필요한 공백 제거)
                 lines = [line.strip() for line in raw_text.split('\n') if line.strip()]
                 description = "\n\n".join(lines)
             else:
-                # 혹시 구조가 바뀌어서 '다음' div([1])에 있을 경우 대비 (Fallback)
                 print("  [알림] '다음 다음' div가 없어 바로 '다음' div 확인")
                 fallback_div = summary_title.locator("xpath=following-sibling::div[1]")
                 if fallback_div.count():
@@ -130,11 +134,9 @@ def crawl_seoulnoin_single_page():
         # 4. 이미지 파싱
         # ---------------------------------------------------------
         img_urls = []
-        
-        # (1) alt="전시이미지" 우선 검색
+
         target_img = page.locator("img[alt='전시이미지']")
-        
-        # (2) 없으면 upload 경로가 포함된 이미지 검색
+
         if not target_img.count():
             target_img = page.locator("img[src*='upload']")
 
@@ -144,7 +146,6 @@ def crawl_seoulnoin_single_page():
                 full_src = urljoin(TARGET_URL, src)
                 img_urls.append(full_src)
 
-        # 중복 제거
         img_urls = list(dict.fromkeys(img_urls))
 
         # ---------------------------------------------------------
@@ -170,12 +171,13 @@ def crawl_seoulnoin_single_page():
                 "gallery_name": GALLERY_NAME,
                 "open_time": DEFAULT_OPEN_TIME_STR,
                 "close_time": DEFAULT_CLOSE_TIME_STR,
-                "author": "" 
+                "author": ""
             }
             return [exhibition_data]
         else:
             print("[실패] 필수 정보(제목 또는 날짜) 누락")
             return []
+
 
 # ==============================
 # DB 저장 함수
@@ -185,7 +187,7 @@ def save_to_postgres(exhibitions):
     db_user = os.getenv("POSTGRES_USER", "pbl")
     db_password = os.getenv("POSTGRES_PASSWORD", "1234")
     db_name = os.getenv("POSTGRES_DB", "pbl")
-    db_host = os.getenv("POSTGRES_HOST", "3.34.46.99")
+    db_host = os.getenv("POSTGRES_HOST", "api.insa-exhibition.shop")
     db_port = os.getenv("POSTGRES_PORT", "5432")
 
     conn = None
@@ -204,13 +206,22 @@ def save_to_postgres(exhibitions):
         today = date.today()
 
         saved_count = 0
+        skipped_count = 0
+
         for ex in exhibitions:
+            # ✅ description 비어있으면 저장하지 않음
+            desc = (ex.get("description") or "").strip()
+            if not desc:
+                print(f"[DB] description 없음, 스킵: {ex.get('title')}")
+                skipped_count += 1
+                continue
+
             s_dt = to_date_or_none(ex.get("start_date"))
             e_dt = to_date_or_none(ex.get("end_date"))
-            
+
             cur.execute(insert_sql, (
                 ex.get("title"),
-                ex.get("description"),
+                desc,  # ✅ 정리된 description 저장
                 ex.get("address"),
                 ex.get("author"),
                 s_dt, e_dt,
@@ -221,26 +232,29 @@ def save_to_postgres(exhibitions):
                 today
             ))
             saved_count += 1
-            
+
         conn.commit()
-        print(f"[DB] 총 {saved_count}개 저장 완료")
+        print(f"[DB] 저장 완료: {saved_count}개 / 스킵: {skipped_count}개")
 
     except Exception as e:
         print(f"[DB Error] {e}")
-        if conn: conn.rollback()
+        if conn:
+            conn.rollback()
     finally:
-        if conn: conn.close()
+        if conn:
+            conn.close()
+
 
 # ==============================
 # 실행부
 # ==============================
 if __name__ == "__main__":
     data = crawl_seoulnoin_single_page()
-    
+
     output_path = "seoulNoin.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-    
+
     if data:
         print(f"\n[완료] JSON 저장됨. DB 저장을 시도합니다.")
         save_to_postgres(data)

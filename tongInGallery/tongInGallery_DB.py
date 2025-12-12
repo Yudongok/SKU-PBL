@@ -162,7 +162,7 @@ def crawl_exhibitions():
 
                 start_date, end_date = parse_operating_day(date_text)
 
-                # 통인화랑 운영시간 (예시: 10:30 ~ 18:30)
+                # 통인화랑 운영시간
                 open_time = "10:30"
                 close_time = "18:30"
 
@@ -172,8 +172,8 @@ def crawl_exhibitions():
                         "address": section,
                         "start_date": start_date,
                         "end_date": end_date,
-                        "open_time": open_time,        # 'HH:MM'
-                        "close_time": close_time,      # 'HH:MM'
+                        "open_time": open_time,
+                        "close_time": close_time,
                         "gallery_name": "통인화랑",
                         "detail_url": detail_url,
                         "author": "",
@@ -257,17 +257,14 @@ def crawl_exhibitions():
                 print(f"   ❌ 로딩 에러: {e}")
                 continue
 
-            # 작가/설명 초기화
             ex["author"] = ""
 
             html_content = page.content()
             soup = BeautifulSoup(html_content, "html.parser")
 
-            # 1. 필요 없는 태그 제거
             for element in soup(["script", "style", "header", "footer", "nav", "aside"]):
                 element.decompose()
 
-            # 2. 전체 텍스트 추출
             all_text = soup.get_text(separator=" |LINE| ")
             lines = all_text.split(" |LINE| ")
 
@@ -288,16 +285,12 @@ def crawl_exhibitions():
 
                 lower_line = clean_line.lower()
 
-                # 쓰레기 줄 필터
-                is_garbage = any(kw in lower_line for kw in garbage_keywords)
-                if is_garbage:
+                if any(kw in lower_line for kw in garbage_keywords):
                     continue
 
-                # 너무 짧은 줄 제거
                 if len(clean_line) < 15:
                     continue
 
-                # 한글 포함된 줄만
                 if re.search(r"[가-힣]", clean_line):
                     valid_lines.append(clean_line)
 
@@ -309,7 +302,6 @@ def crawl_exhibitions():
             else:
                 print("   ⚠️ 설명을 찾지 못했습니다.")
 
-            # 이미지 추출
             gallery_images = page.evaluate(
                 """() => {
                     const imgs = [];
@@ -336,10 +328,8 @@ def crawl_exhibitions():
                     full_url = urljoin(BASE_URL, full_url)
                 current_images.append(full_url)
 
-            # 중복 제거
             ex["img_url"] = list(dict.fromkeys(current_images))
 
-        # detail_url 키 제거 (DB/JSON에는 필요 없음)
         for ex in exhibitions:
             ex.pop("detail_url", None)
 
@@ -353,28 +343,12 @@ def crawl_exhibitions():
 
 def save_to_postgres(exhibitions):
     """
-    exhibition 테이블 구조 (다른 크롤러와 동일 가정):
-
-      id           BIGINT PK
-      title        VARCHAR(...) NOT NULL
-      description  VARCHAR(...) NOT NULL
-      address      VARCHAR(...)
-      author       VARCHAR(...) NOT NULL
-      start_date   DATE
-      end_date     DATE NOT NULL
-      open_time    TIME
-      close_time   TIME
-      views        INTEGER NOT NULL
-      img_url      VARCHAR(255)[] NOT NULL
-      gallery_name VARCHAR(...)
-      phone_num    VARCHAR(...)
-      created_at   DATE NOT NULL
-      modified_at  DATE
+    exhibition 테이블 구조 (다른 크롤러와 동일 가정)
     """
     db_user = os.getenv("POSTGRES_USER", "pbl")
     db_password = os.getenv("POSTGRES_PASSWORD", "1234")
     db_name = os.getenv("POSTGRES_DB", "pbl")
-    db_host = os.getenv("POSTGRES_HOST", "3.34.46.99")  # 필요 시 변경
+    db_host = os.getenv("POSTGRES_HOST", "api.insa-exhibition.shop")
     db_port = os.getenv("POSTGRES_PORT", "5432")
 
     conn = None
@@ -405,14 +379,23 @@ def save_to_postgres(exhibitions):
         """
 
         today = date.today()
+        saved = 0
+        skipped = 0
 
         for ex in exhibitions:
             start_dt = to_date_or_none(ex.get("start_date"))
             end_dt = to_date_or_none(ex.get("end_date"))
 
-            # end_date NOT NULL → 없으면 스킵
             if end_dt is None:
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
+                skipped += 1
+                continue
+
+            # ✅ description 비어있으면 저장하지 않음
+            desc = (ex.get("description") or "").strip()
+            if not desc:
+                print(f"[DB] description 없음, 스킵: {ex.get('title')}")
+                skipped += 1
                 continue
 
             open_t = to_time_or_none(ex.get("open_time"))
@@ -422,24 +405,25 @@ def save_to_postgres(exhibitions):
                 insert_sql,
                 (
                     ex.get("title") or "",
-                    ex.get("description") or "",
+                    desc,  # ✅ 정제된 description 저장
                     ex.get("address"),
                     ex.get("author") or "",
                     start_dt,
                     end_dt,
                     open_t,
                     close_t,
-                    0,                          # views 기본값 0
-                    ex.get("img_url", []),      # 배열 컬럼
+                    0,
+                    ex.get("img_url", []),
                     ex.get("gallery_name"),
-                    None,                       # phone_num (현재 없음)
+                    None,
                     today,
                     None,
                 ),
             )
+            saved += 1
 
         conn.commit()
-        print(f"[DB] exhibition 테이블에 {len(exhibitions)}개 INSERT 시도 완료")
+        print(f"[DB] 저장 완료: {saved}개 / 스킵: {skipped}개")
 
     except Exception as e:
         print("[DB] 에러 발생:", e)
@@ -457,7 +441,6 @@ def save_to_postgres(exhibitions):
 if __name__ == "__main__":
     data = crawl_exhibitions()
 
-    # 1) JSON 저장
     output_path = "tongInGallery.json"
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -466,5 +449,4 @@ if __name__ == "__main__":
     print(f"전시 개수: {len(data)}")
     print("=========json저장 완료=========")
 
-    # 2) DB 저장
     save_to_postgres(data)

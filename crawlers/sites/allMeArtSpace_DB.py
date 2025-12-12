@@ -1,12 +1,12 @@
+from __future__ import annotations
+
 from urllib.parse import urljoin
 from playwright.sync_api import sync_playwright
 import json
 import re
-from datetime import datetime, date, time
-import os
-
-import psycopg2  # PostgreSQL 연동용
-
+from datetime import datetime
+from pathlib import Path
+from typing import List, Dict, Any
 
 # ==============================
 # 기본 설정
@@ -14,6 +14,11 @@ import psycopg2  # PostgreSQL 연동용
 
 # 올미아트스페이스 현재 전시 URL
 LIST_URL = "http://www.allmeartspace.com/b/exhibitions/?state=current"
+
+GALLERY_NAME = "올미아트스페이스"
+GALLERY_ADDRESS_DEFAULT = "서울 종로구 우정국로 51 올미아트스페이스"
+DEFAULT_OPEN_TIME_STR = "10:30"
+DEFAULT_CLOSE_TIME_STR = "18:00"
 
 
 # ==============================
@@ -23,14 +28,14 @@ LIST_URL = "http://www.allmeartspace.com/b/exhibitions/?state=current"
 def parse_single_date(part, base_date=None):
     """
     part: '2025. 11. 26', '2025.12.3', '12.8', '8', '2025-08-25' 같은 문자열
-    base_date: 연/월이 생략된 경우 참고할 기준 날짜 (datetime 또는 None)
+    base_date: 연/월이 생략된 경우 참고할 기준 날짜
     """
     if not part:
         return None
 
     s = part.strip()
 
-    # 0) YYYY-MM-DD 형식 우선 처리
+    # 0) YYYY-MM-DD
     m = re.match(r"^(\d{4})-(\d{1,2})-(\d{1,2})$", s)
     if m:
         y, mth, d = map(int, m.groups())
@@ -78,12 +83,6 @@ def parse_operating_day(operating_day: str):
     """
     예시:
       '2025-11-27(목) ~2025-12-30(화)' -> ('2025-11-27', '2025-12-30')
-      '2025-08-25 - 2026-05-31'
-      '2025. 11. 26 - 2025. 12. 15'
-      '2025.12.3-12.8'
-      '2025.12.3 ~ 12.8'
-      '2025.12.3 ~ 2025.12.8'
-    실패 시: (원본 문자열, "")
     """
     if not operating_day:
         return "", ""
@@ -129,49 +128,6 @@ def parse_operating_day(operating_day: str):
     return start_dt.strftime("%Y-%m-%d"), end_dt.strftime("%Y-%m-%d")
 
 
-def parse_operating_hour(operating_hour: str):
-    """
-    예시: '10:30 ~ 18:00'
-    -> ('10:30', '18:00')
-    """
-    if not operating_hour:
-        return "", ""
-
-    base = operating_hour.split("(", 1)[0].strip()
-    times = re.findall(r"\d{1,2}:\d{2}", base)
-
-    if len(times) >= 2:
-        return times[0], times[1]
-    elif len(times) == 1:
-        return times[0], ""
-    else:
-        return "", ""
-
-
-def to_date_or_none(s: str):
-    """'YYYY-MM-DD' 를 date 객체로 변환, 아니면 None"""
-    if not s:
-        return None
-    s = s.strip()
-    if len(s) != 10:
-        return None
-    try:
-        return datetime.strptime(s, "%Y-%m-%d").date()
-    except ValueError:
-        return None
-
-
-def to_time_or_none(s: str):
-    """'HH:MM' 형식 문자열을 time 객체로 변환, 아니면 None"""
-    if not s:
-        return None
-    s = s.strip()
-    try:
-        return datetime.strptime(s, "%H:%M").time()
-    except ValueError:
-        return None
-
-
 def normalize_text(s: str) -> str:
     """None/공백/줄바꿈 정리해서 의미 있는 텍스트만 남김"""
     if not s:
@@ -183,7 +139,11 @@ def normalize_text(s: str) -> str:
 # 크롤러 본체 (올미아트스페이스)
 # ==============================
 
-def crawl_exhibitions():
+def crawl() -> List[Dict[str, Any]]:
+    """
+    ✅ 회사 스타일: 크롤링만 담당하고 list[dict] 반환
+    DB 저장은 runner/db.py에서 공통 처리
+    """
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
@@ -192,10 +152,9 @@ def crawl_exhibitions():
         page.goto(LIST_URL, timeout=60_000)
         page.wait_for_timeout(3000)
 
-        exhibitions = []
-        detail_urls = []
+        exhibitions: List[Dict[str, Any]] = []
+        detail_urls: List[str] = []
 
-        # 전시 아이템: <div class="cbp-item ...">
         items = page.locator("div.cbp-item")
         count = items.count()
         print(f"[리스트] 전시 개수(올미): {count}")
@@ -210,10 +169,7 @@ def crawl_exhibitions():
 
             # (1) 제목
             title_el = item.locator("a.cbp-l-grid-masonry-projects-title")
-            if title_el.count():
-                raw_title = title_el.first.inner_text()
-            else:
-                raw_title = item.inner_text()
+            raw_title = title_el.first.inner_text() if title_el.count() else item.inner_text()
             title_kr = " ".join(raw_title.split())
 
             # (2) 상세 페이지 URL
@@ -227,26 +183,13 @@ def crawl_exhibitions():
             href = link_el.first.get_attribute("href") or ""
             detail_url = urljoin(LIST_URL, href)
 
-            # (3) 기간 텍스트: div.cbp-l-grid-masonry-projects-desc
+            # (3) 기간 텍스트
             operating_day_el = item.locator("div.cbp-l-grid-masonry-projects-desc")
-            if operating_day_el.count():
-                operating_day = operating_day_el.first.inner_text().strip()
-            else:
-                operating_day = ""
-
+            operating_day = operating_day_el.first.inner_text().strip() if operating_day_el.count() else ""
             start_date, end_date = parse_operating_day(operating_day)
 
-            # (4) 주소 / 갤러리명 (기본값)
-            hall = "서울 종로구 우정국로 51 올미아트스페이스"
-            gallery_txt = "올미아트스페이스"
-
-            # (5) 운영시간 (현재는 정보 없으니 공백 → DB에 None)
-            operating_hour = ""
-            open_time, close_time = parse_operating_hour(operating_hour)
-
-            # (6) 리스트 썸네일 이미지: .cbp-caption-defaultWrap img
-            #     → src에 '/data/file' 포함된 것만 사용
-            thumb_urls = []
+            # (4) 리스트 썸네일
+            thumb_urls: List[str] = []
             thumb_img = item.locator(".cbp-caption-defaultWrap img")
             if thumb_img.count():
                 src = thumb_img.first.get_attribute("src")
@@ -260,32 +203,30 @@ def crawl_exhibitions():
                     "title": title_kr,
                     "start_date": start_date,
                     "end_date": end_date,
-                    "address": hall,
-                    "gallery_name": gallery_txt,
-                    "open_time": "10:30",
-                    "close_time": "18:00",
-                    "author": "",              # 작가 이름 (상세에서 채움)
-                    "description": "",
-                    "img_url": thumb_urls,     # 리스트 썸네일 우선
+                    "address": GALLERY_ADDRESS_DEFAULT,
+                    "gallery_name": GALLERY_NAME,
+                    "open_time": DEFAULT_OPEN_TIME_STR,
+                    "close_time": DEFAULT_CLOSE_TIME_STR,
+                    "author": "",       # 상세에서 채움
+                    "description": "",  # 상세에서 채움
+                    "img_url": thumb_urls,
                 }
             )
             detail_urls.append(detail_url)
 
         print(f"[리스트] 수집된 전시 수: {len(exhibitions)}")
 
-        # 2) 각 전시별 상세 페이지 크롤링
+        # 2) 상세 크롤링
         for i, ex in enumerate(exhibitions):
             url = detail_urls[i]
             print(f"\n[상세] 이동: {ex['title']} -> {url}")
             page.goto(url, timeout=60_000)
             page.wait_for_timeout(3000)
 
-            # (0) 상세 상단 정보에서 '장소' 있으면 address 덮어쓰기 (있으면)
+            # (0) 장소(있으면)
             hall_detail = None
             info_items = page.locator("ul li")
-            info_count = info_items.count()
-
-            for k in range(info_count):
+            for k in range(info_items.count()):
                 li = info_items.nth(k)
                 dt_el = li.locator("dt")
                 dd_el = li.locator("dd")
@@ -298,27 +239,23 @@ def crawl_exhibitions():
                 if "전시장소" in dt_text or "장소" in dt_text:
                     hall_detail = dd_text
                     break
-
             if hall_detail:
                 ex["address"] = hall_detail
 
             # (1) 작가 정보 (있으면)
             artist = ""
             rows = page.locator("tr")
-            row_count = rows.count()
-
-            for j in range(row_count):
+            for j in range(rows.count()):
                 row = rows.nth(j)
                 cells = row.locator("th, td")
                 if cells.count() < 2:
                     continue
-
                 label = cells.nth(0).inner_text().strip()
                 if "작가" in label or "Artist" in label:
                     artist = "".join(cells.nth(1).inner_text().split())
                     break
 
-            # (2) 설명 텍스트 컨테이너 찾기 (여러 후보)
+            # (2) 설명
             content = None
             content_selectors = [
                 "div.exhibition_view",
@@ -328,7 +265,6 @@ def crawl_exhibitions():
                 "div#content",
                 "article",
             ]
-
             for sel in content_selectors:
                 c = page.locator(sel)
                 if c.count() and c.inner_text().strip():
@@ -339,165 +275,54 @@ def crawl_exhibitions():
                 paragraphs = page.locator("p").all_inner_texts()
             else:
                 p_loc = content.locator("p")
-                if p_loc.count():
-                    paragraphs = p_loc.all_inner_texts()
-                else:
-                    paragraphs = [content.inner_text()]
+                paragraphs = p_loc.all_inner_texts() if p_loc.count() else [content.inner_text()]
 
             lines = [p.strip() for p in paragraphs if p.strip()]
             description = "\n".join(lines).strip()
 
-            # (3) 이미지 URL: '/data/file' 이 들어간 것만
-            image_urls = list(ex.get("img_url", []))  # 썸네일 그대로 시작
-
+            # (3) 이미지: '/data/file' 만
+            image_urls = list(ex.get("img_url", []))
             img_els = page.locator("img")
-            img_count = img_els.count()
-
-            for idx in range(img_count):
-                img_el = img_els.nth(idx)
-                src = img_el.get_attribute("src")
+            for idx in range(img_els.count()):
+                src = img_els.nth(idx).get_attribute("src")
                 if not src:
                     continue
                 src = src.strip()
-                if not src:
+                if not src or "/data/file" not in src:
                     continue
-
-                # /data/file 경로만 사용
-                if "/data/file" not in src:
-                    continue
-
-                full_src = urljoin(url, src)
-                image_urls.append(full_src)
-
-            # 중복 제거
-            image_urls = list(dict.fromkeys(image_urls))
+                image_urls.append(urljoin(url, src))
 
             ex["author"] = artist
             ex["description"] = description
-            ex["img_url"] = image_urls
+            ex["img_url"] = list(dict.fromkeys(image_urls))  # 중복 제거
 
-            print(f"[상세] 이미지 개수: {len(image_urls)}, 설명 길이: {len(normalize_text(description))}")
+            print(f"[상세] 이미지 개수: {len(ex['img_url'])}, 설명 길이: {len(normalize_text(description))}")
 
         browser.close()
         print(f"\n[최종] 올미 전시 {len(exhibitions)}개 상세 정보 수집 완료")
         return exhibitions
 
 
-# ==============================
-# DB 저장 함수
-# ==============================
-
-def save_to_postgres(exhibitions):
+def run(save_json: bool = True) -> List[Dict[str, Any]]:
     """
-    exhibition 테이블 구조(인사아트/프리마와 동일 가정):
+    ✅ runner.py가 이 함수를 호출하도록 맞추는 '엔트리 함수'
     """
-    db_user = os.getenv("POSTGRES_USER", "pbl")
-    db_password = os.getenv("POSTGRES_PASSWORD", "1234")
-    db_name = os.getenv("POSTGRES_DB", "pbl")
-    db_host = os.getenv("POSTGRES_HOST", "api.insa-exhibition.shop")
-    db_port = os.getenv("POSTGRES_PORT", "5432")
+    data = crawl()
 
-    conn = None
-    try:
-        conn = psycopg2.connect(
-            dbname=db_name,
-            user=db_user,
-            password=db_password,
-            host=db_host,
-            port=db_port,
+    if save_json:
+        json_dir = Path(__file__).resolve().parent / "json"
+        json_dir.mkdir(parents=True, exist_ok=True)
+
+        out_path = json_dir / "allMeArtSapce.json"
+        out_path.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2),
+            encoding="utf-8",
         )
-        cur = conn.cursor()
+        print(f"[JSON] 저장 완료: {out_path}")
 
-        insert_sql = """
-        INSERT INTO exhibition
-        (title, description, address,
-         author, start_date, end_date,
-         open_time, close_time,
-         views, img_url,
-         gallery_name, phone_num,
-         created_at, modified_at)
-        VALUES (%s, %s, %s,
-                %s, %s, %s,
-                %s, %s,
-                %s, %s,
-                %s, %s,
-                %s, %s)
-        """
+    return data
 
-        today = date.today()
-
-        inserted = 0
-        skipped_no_end_date = 0
-        skipped_no_description = 0
-
-        for ex in exhibitions:
-            start_dt = to_date_or_none(ex.get("start_date"))
-            end_dt = to_date_or_none(ex.get("end_date"))
-
-            # end_date NOT NULL이면 없는 건 스킵
-            if end_dt is None:
-                skipped_no_end_date += 1
-                print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
-                continue
-
-            # ✅ description이 한 글자도 없으면 스킵
-            desc = normalize_text(ex.get("description") or "")
-            if not desc:
-                skipped_no_description += 1
-                print(f"[DB] description 비어있음, 스킵: {ex.get('title')}")
-                continue
-
-            open_t = to_time_or_none(ex.get("open_time"))
-            close_t = to_time_or_none(ex.get("close_time"))
-
-            cur.execute(
-                insert_sql,
-                (
-                    ex.get("title") or "",
-                    desc,                      # 정리된 description 사용
-                    ex.get("address"),
-                    ex.get("author") or "",
-                    start_dt,
-                    end_dt,
-                    open_t,
-                    close_t,
-                    0,
-                    ex.get("img_url", []),
-                    ex.get("gallery_name"),
-                    None,
-                    today,
-                    None,
-                ),
-            )
-            inserted += 1
-
-        conn.commit()
-        print(f"[DB] INSERT 성공: {inserted}건 / end_date 없음 스킵: {skipped_no_end_date}건 / description 없음 스킵: {skipped_no_description}건")
-
-    except Exception as e:
-        print("[DB] 에러 발생:", e)
-        if conn:
-            conn.rollback()
-    finally:
-        if conn:
-            conn.close()
-
-
-# ==============================
-# 메인 실행부
-# ==============================
 
 if __name__ == "__main__":
-    data = crawl_exhibitions()
-
-    # 1) JSON 파일로 저장
-    output_path = "allmeArt.json"
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-    print(f"\nJSON 저장 완료: {output_path}")
-    print(f"전시 개수: {len(data)}")
-    print("=========json저장 완료=========")
-
-    # 2) DB에 저장
-    save_to_postgres(data)
+    # 단독 실행도 가능하게만 유지
+    run(save_json=True)

@@ -291,7 +291,6 @@ def crawl_exhibitions():
                 p_count = p_loc.count()
                 if p_count:
                     for idx in range(p_count):
-                        # p 안 span까지 포함한 전체 텍스트
                         txt = p_loc.nth(idx).inner_text().strip()
                         if txt:
                             paragraphs.append(txt)
@@ -302,10 +301,9 @@ def crawl_exhibitions():
 
             description = "\n".join(paragraphs)
 
-            # (3) 이미지 URL: ❗ div.vc_column-inner 안에 있는 이미지 / 링크만 크롤링
+            # (3) 이미지 URL: div.vc_column-inner 안에 있는 이미지/링크만 크롤링
             image_urls = []
 
-            # 우선 a 태그 href(원본 큰 이미지) 위주로 수집
             link_els = page.locator("div.vc_column-inner a[href*='wp-content/uploads']")
             for idx in range(link_els.count()):
                 href = link_els.nth(idx).get_attribute("href")
@@ -317,7 +315,6 @@ def crawl_exhibitions():
                 full_src = urljoin(url, href)
                 image_urls.append(full_src)
 
-            # 혹시 a가 없고 img만 있는 경우 대비: img src 사용
             img_els = page.locator("div.vc_column-inner img[src*='wp-content/uploads']")
             for idx in range(img_els.count()):
                 src = img_els.nth(idx).get_attribute("src")
@@ -329,7 +326,6 @@ def crawl_exhibitions():
                 full_src = urljoin(url, src)
                 image_urls.append(full_src)
 
-            # 중복 제거
             image_urls = list(dict.fromkeys(image_urls))
 
             ex["author"] = artist
@@ -349,28 +345,12 @@ def crawl_exhibitions():
 
 def save_to_postgres(exhibitions):
     """
-    exhibition 테이블 구조 (기존과 동일 가정):
-
-      id           BIGINT PK (auto increment)
-      title        VARCHAR(...) NOT NULL
-      description  VARCHAR(...) NOT NULL
-      address      VARCHAR(...)
-      author       VARCHAR(...) NOT NULL
-      start_date   DATE
-      end_date     DATE NOT NULL
-      open_time    TIME
-      close_time   TIME
-      views        INTEGER NOT NULL
-      img_url      VARCHAR(255)[] NOT NULL
-      gallery_name VARCHAR(...)
-      phone_num    VARCHAR(...)
-      created_at   DATE NOT NULL
-      modified_at  DATE
+    exhibition 테이블 구조 (기존과 동일 가정)
     """
     db_user = os.getenv("POSTGRES_USER", "pbl")
     db_password = os.getenv("POSTGRES_PASSWORD", "1234")
     db_name = os.getenv("POSTGRES_DB", "pbl")
-    db_host = os.getenv("POSTGRES_HOST", "3.34.46.99")
+    db_host = os.getenv("POSTGRES_HOST", "api.insa-exhibition.shop")
     db_port = os.getenv("POSTGRES_PORT", "5432")
 
     conn = None
@@ -406,12 +386,17 @@ def save_to_postgres(exhibitions):
             start_dt = to_date_or_none(ex.get("start_date"))
             end_dt = to_date_or_none(ex.get("end_date"))
 
+            # ✅ description 비어있으면 INSERT 스킵
+            desc = (ex.get("description") or "").strip()
+            if not desc:
+                print(f"[DB] description 없음, 스킵: {ex.get('title')}")
+                continue
+
             # end_date NOT NULL이면 없는 건 스킵
             if end_dt is None:
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
                 continue
 
-            # 시간 파싱 실패 시 기본값으로 대체
             open_t = to_time_or_none(ex.get("open_time")) or DEFAULT_OPEN_TIME
             close_t = to_time_or_none(ex.get("close_time")) or DEFAULT_CLOSE_TIME
 
@@ -419,24 +404,24 @@ def save_to_postgres(exhibitions):
                 insert_sql,
                 (
                     ex.get("title") or "",
-                    ex.get("description") or "",
+                    desc,  # ✅ 정리된 description 사용
                     ex.get("address"),
                     ex.get("author") or "",
                     start_dt,
                     end_dt,
                     open_t,
                     close_t,
-                    0,                         # views 기본값 0
-                    ex.get("img_url", []),     # img_url: 배열 컬럼 가정
+                    0,
+                    ex.get("img_url", []),
                     ex.get("gallery_name"),
-                    None,                      # phone_num: 아직 없음
+                    None,
                     today,
                     None,
                 ),
             )
 
         conn.commit()
-        print(f"[DB] exhibition 테이블에 {len(exhibitions)}개 INSERT 시도 완료")
+        print(f"[DB] exhibition 테이블에 INSERT 시도 완료 (description 없는 건 제외)")
 
     except Exception as e:
         print("[DB] 에러 발생:", e)
@@ -463,6 +448,5 @@ if __name__ == "__main__":
     print(f"전시 개수: {len(data)}")
     print("=========json저장 완료=========")
 
-     # 2) DB에 저장
+    # 2) DB에 저장
     save_to_postgres(data)
-

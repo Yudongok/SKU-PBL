@@ -6,7 +6,6 @@ from datetime import datetime, date, time
 import os
 
 import psycopg2  # PostgreSQL 연동용
-# from psycopg2.extras import Json  # 지금은 안 씀 (imageUrl을 배열로 저장한다고 가정)
 
 
 # 갤러리 인사아트의 현재 전시 url
@@ -143,6 +142,14 @@ def to_time_or_none(s: str):
         return None
 
 
+def normalize_text(s: str) -> str:
+    """None/공백/줄바꿈 정리해서 '의미 있는 텍스트'만 남김"""
+    if not s:
+        return ""
+    # 공백만 있는 경우도 제거
+    return s.strip()
+
+
 # ==============================
 # 크롤러 본체
 # ==============================
@@ -248,7 +255,7 @@ def crawl_exhibitions():
             ex["description"] = description
             ex["img_url"] = image_urls
 
-            print(f"[상세] 이미지 개수: {len(image_urls)}")
+            print(f"[상세] 이미지 개수: {len(image_urls)}, 설명 길이: {len(normalize_text(description))}")
 
         browser.close()
         print(f"\n[최종] 전시 {len(exhibitions)}개 상세 정보 수집 완료")
@@ -273,16 +280,16 @@ def save_to_postgres(exhibitions):
       open_time    TIME
       close_time   TIME
       views        INTEGER NOT NULL
-      imageUrl     VARCHAR(255)[] NOT NULL   -- 배열 타입이라고 가정
-      galleryName  VARCHAR(...)
-      phoneNum     VARCHAR(...)
-      createdAt    DATE NOT NULL
-      modifiedAt   DATE
+      img_url      VARCHAR(255)[] NOT NULL
+      gallery_name VARCHAR(...)
+      phone_num    VARCHAR(...)
+      created_at   DATE NOT NULL
+      modified_at  DATE
     """
     db_user = os.getenv("POSTGRES_USER", "pbl")
     db_password = os.getenv("POSTGRES_PASSWORD", "1234")
     db_name = os.getenv("POSTGRES_DB", "pbl")
-    db_host = os.getenv("POSTGRES_HOST", "3.34.46.99")  # 필요 시 localhost 등으로 변경
+    db_host = os.getenv("POSTGRES_HOST", "api.insa-exhibition.shop")
     db_port = os.getenv("POSTGRES_PORT", "5432")
 
     conn = None
@@ -314,6 +321,10 @@ def save_to_postgres(exhibitions):
 
         today = date.today()
 
+        inserted = 0
+        skipped_no_end_date = 0
+        skipped_no_description = 0
+
         for ex in exhibitions:
             # 날짜 문자열 -> date 객체로 변환
             start_dt = to_date_or_none(ex.get("start_date"))
@@ -321,7 +332,15 @@ def save_to_postgres(exhibitions):
 
             # end_date는 NOT NULL 가정 → 없으면 스킵
             if end_dt is None:
+                skipped_no_end_date += 1
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
+                continue
+
+            # ✅ 설명이 한 글자라도 없으면(공백 포함) 스킵
+            desc = normalize_text(ex.get("description") or "")
+            if not desc:
+                skipped_no_description += 1
+                print(f"[DB] description 비어있음, 스킵: {ex.get('title')}")
                 continue
 
             open_t = to_time_or_none(ex.get("open_time"))
@@ -330,25 +349,26 @@ def save_to_postgres(exhibitions):
             cur.execute(
                 insert_sql,
                 (
-                    ex.get("title") or "",          # title (NOT NULL)
-                    ex.get("description") or "",    # description (NOT NULL)
-                    ex.get("address"),              # address
-                    ex.get("author") or "",         # author (NOT NULL)
-                    start_dt,                       # start_date
-                    end_dt,                         # end_date (NOT NULL)
-                    open_t,                         # open_time
-                    close_t,                        # close_time
-                    0,                              # views 초기값
-                    ex.get("img_url", []),         # imageUrl: 배열 컬럼 가정
+                    ex.get("title") or "",       # title (NOT NULL)
+                    desc,                        # description (NOT NULL) - 정리된 desc 사용
+                    ex.get("address"),
+                    ex.get("author") or "",      # author (NOT NULL)
+                    start_dt,
+                    end_dt,
+                    open_t,
+                    close_t,
+                    0,                           # views 초기값
+                    ex.get("img_url", []),       # img_url: 배열 컬럼 가정
                     ex.get("gallery_name"),
-                    None,                           # phoneNum: 지금은 없음
-                    today,                          # createdAt
-                    None,                           # modifiedAt
+                    None,                        # phone_num: 지금은 없음
+                    today,
+                    None,
                 ),
             )
+            inserted += 1
 
         conn.commit()
-        print(f"[DB] exhibition 테이블에 {len(exhibitions)}개 INSERT 시도 완료")
+        print(f"[DB] INSERT 성공: {inserted}건 / end_date 없음 스킵: {skipped_no_end_date}건 / description 없음 스킵: {skipped_no_description}건")
 
     except Exception as e:
         print("[DB] 에러 발생:", e)

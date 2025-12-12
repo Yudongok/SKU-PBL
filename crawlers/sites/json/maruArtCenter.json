@@ -3,12 +3,12 @@
     "title": "중부대학교 사진영상학전공 졸업전ㅣDOT",
     "start_date": "2025-12-10",
     "end_date": "2025-12-15",
-    "galleryName": "마루아트센터",
-    "open_time": "AM 10:30",
-    "close_time": "PM 18:30",
+    "gallery_name": "마루아트센터",
+    "open_time": "10:30",
+    "close_time": "18:30",
     "address": "마루아트센터  B1층 특별관/ 신관 1층 1관/ 신관 3층 2,3,4관",
     "description": "",
-    "imageUrl": [
+    "img_url": [
       "https://maruartcenter.co.kr/bizdemo133414/component/board/board_10/u_image/810/1974156816_ECA491EBB680EB8C80-ED8FACEC8AA4ED84B0-.jpg",
       "https://maruartcenter.co.kr/bizdemo133414/component/board/board_10/u_image/810/494418368_EC8898ECA095EB90A8_KakaoTalk_20251211_163425436_03.jpg",
       "https://maruartcenter.co.kr/bizdemo133414/component/board/board_10/u_image/810/1137762191_EC8898ECA095EB90A8_KakaoTalk_20251211_163425436_04.jpg",
@@ -29,12 +29,12 @@
     "title": "목원대학교 한국화전공 졸업작품전ㅣ모숨, 우리의 ..",
     "start_date": "2025-12-10",
     "end_date": "2025-12-15",
-    "galleryName": "마루아트센터",
-    "open_time": "AM 10:30",
-    "close_time": "PM 18:30",
+    "gallery_name": "마루아트센터",
+    "open_time": "10:30",
+    "close_time": "18:30",
     "address": "마루아트센터 본관 3층 그랜드관",
     "description": "",
-    "imageUrl": [
+    "img_url": [
       "https://maruartcenter.co.kr/bizdemo133414/component/board/board_10/u_image/809/2046689420_ED8FACEC8AA4ED84B032.jpg",
       "https://maruartcenter.co.kr/bizdemo133414/component/board/board_10/u_image/809/2111373603_12.jpg",
       "https://maruartcenter.co.kr/bizdemo133414/component/board/board_10/u_image/809/1299760504_11.jpg",
