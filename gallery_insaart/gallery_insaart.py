@@ -8,11 +8,7 @@ from datetime import datetime
 # 갤러리 인사아트의 현재 전시 url
 LIST_URL = "https://galleryinsaart.com/exhibitions-current/"
 
-
-# ==============================
 # 날짜/시간 파싱 유틸 함수들
-# ==============================
-
 def parse_single_date(part: str, base_date: datetime | None = None) -> datetime | None:
     """
     part: '2025.12.3', '2025. 12. 03', '12.8', '8' 같은 문자열
@@ -121,9 +117,7 @@ def parse_operating_hour(operating_hour: str):
     return open_time, close_time
 
 
-# ==============================
 # 크롤러 본체
-# ==============================
 
 def crawl_exhibitions():
     with sync_playwright() as p:                    # sync_playwright(): 동기(Sync)방식으로 Playwright를 실행
