@@ -5,13 +5,10 @@ import re
 from datetime import datetime, date, time
 import os
 
-import psycopg2  # PostgreSQL 연동용
+import psycopg2 
 
 
-# ==============================
 # 기본 설정
-# ==============================
-
 LIST_URL = "http://www.gallerymeme.com/web/current.html"
 
 GALLERY_NAME = "갤러리밈"
@@ -22,10 +19,7 @@ DEFAULT_OPEN_TIME = time(10, 30)   # 10:30
 DEFAULT_CLOSE_TIME = time(18, 30)  # 18:30
 
 
-# ==============================
 # 날짜/시간 파싱 유틸 함수들
-# ==============================
-
 def normalize_text(s: str) -> str:
     """None/공백만 있는 문자열 제거용"""
     if not s:
@@ -167,9 +161,7 @@ def to_time_or_none(s: str):
         return None
 
 
-# ==============================
 # 크롤러 본체 (갤러리밈)
-# ==============================
 
 def crawl_exhibitions():
     with sync_playwright() as p:
@@ -339,9 +331,7 @@ def crawl_exhibitions():
         return exhibitions
 
 
-# ==============================
 # DB 저장 함수
-# ==============================
 
 def save_to_postgres(exhibitions):
     db_user = os.getenv("POSTGRES_USER", "pbl")
@@ -392,7 +382,7 @@ def save_to_postgres(exhibitions):
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
                 continue
 
-            # ✅ description이 한 글자도 없으면 스킵
+            # description이 한 글자도 없으면 스킵
             desc = normalize_text(ex.get("description") or "")
             if not desc:
                 skipped_no_description += 1
@@ -435,9 +425,7 @@ def save_to_postgres(exhibitions):
             conn.close()
 
 
-# ==============================
 # 메인 실행부
-# ==============================
 
 if __name__ == "__main__":
     data = crawl_exhibitions()
