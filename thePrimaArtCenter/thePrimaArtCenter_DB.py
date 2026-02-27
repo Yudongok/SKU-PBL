@@ -5,20 +5,13 @@ import re
 from datetime import datetime, date, time
 import os
 
-import psycopg2  # PostgreSQL 연동용
+import psycopg2  
 
-
-# ==============================
-# 기본 설정
-# ==============================
 
 # 프리마아트센터 현재 전시 URL
 LIST_URL = "https://primaartcenter.co.kr/kor/exhibition/list.html?state=current"
 
-
-# ==============================
 # 날짜/시간 파싱 유틸 함수들
-# ==============================
 
 def parse_single_date(part, base_date=None):
     """
@@ -161,9 +154,7 @@ def to_time_or_none(s: str):
         return None
 
 
-# ==============================
 # 크롤러 본체 (프리마아트센터)
-# ==============================
 
 def crawl_exhibitions():
     with sync_playwright() as p:
@@ -356,9 +347,7 @@ def crawl_exhibitions():
         return exhibitions
 
 
-# ==============================
 # DB 저장 함수
-# ==============================
 
 def save_to_postgres(exhibitions):
     db_user = os.getenv("POSTGRES_USER", "pbl")
@@ -407,7 +396,7 @@ def save_to_postgres(exhibitions):
                 skipped += 1
                 continue
 
-            # ✅ description 비어있으면 저장하지 않음
+            # description 비어있으면 저장하지 않음
             desc = (ex.get("description") or "").strip()
             if not desc:
                 print(f"[DB] description 없음, 스킵: {ex.get('title')}")
@@ -421,7 +410,7 @@ def save_to_postgres(exhibitions):
                 insert_sql,
                 (
                     ex.get("title") or "",
-                    desc,  # ✅ 정리된 description 저장
+                    desc,  # 정리된 description 저장
                     ex.get("address"),
                     ex.get("author") or "",
                     start_dt,
@@ -450,9 +439,7 @@ def save_to_postgres(exhibitions):
             conn.close()
 
 
-# ==============================
 # 메인 실행부
-# ==============================
 
 if __name__ == "__main__":
     data = crawl_exhibitions()
