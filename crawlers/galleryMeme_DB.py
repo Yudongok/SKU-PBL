@@ -5,27 +5,20 @@ import re
 from datetime import datetime, date, time
 import os
 
-import psycopg2  # PostgreSQL 연동용
+import psycopg2  
 
-
-# ==============================
 # 기본 설정
-# ==============================
-
 LIST_URL = "http://www.gallerymeme.com/web/current.html"
 
 GALLERY_NAME = "갤러리밈"
-BASE_ADDRESS = "갤러리밈"  # 필요하면 실제 주소로 교체
+BASE_ADDRESS = "갤러리밈"  
 
-# 없을 때 쓸 기본 운영 시간
+# 기본 운영 시간
 DEFAULT_OPEN_TIME = time(10, 30)   # 10:30
 DEFAULT_CLOSE_TIME = time(18, 30)  # 18:30
 
 
-# ==============================
 # 날짜/시간 파싱 유틸 함수들
-# ==============================
-
 def normalize_text(s: str) -> str:
     """None/공백만 있는 문자열 제거용"""
     if not s:
@@ -167,10 +160,7 @@ def to_time_or_none(s: str):
         return None
 
 
-# ==============================
 # 크롤러 본체 (갤러리밈)
-# ==============================
-
 def crawl_exhibitions():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -292,7 +282,7 @@ def crawl_exhibitions():
                 l = line.strip()
                 lower = l.lower()
 
-                # 작가 이력/경력이 시작되는 신호들 → 여기서부터는 버림
+                # 작가 이력/경력이 시작되는 부분→ 여기서부터는 버림
                 if re.match(r"^b\.\s*\d{4}", l):
                     break
                 if any(kw in lower for kw in [
@@ -339,10 +329,7 @@ def crawl_exhibitions():
         return exhibitions
 
 
-# ==============================
 # DB 저장 함수
-# ==============================
-
 def save_to_postgres(exhibitions):
     db_user = os.getenv("POSTGRES_USER", "pbl")
     db_password = os.getenv("POSTGRES_PASSWORD", "1234")
@@ -392,7 +379,7 @@ def save_to_postgres(exhibitions):
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
                 continue
 
-            # ✅ description이 한 글자도 없으면 스킵
+            # description이 한 글자도 없으면 스킵
             desc = normalize_text(ex.get("description") or "")
             if not desc:
                 skipped_no_description += 1
@@ -435,10 +422,7 @@ def save_to_postgres(exhibitions):
             conn.close()
 
 
-# ==============================
 # 메인 실행부
-# ==============================
-
 if __name__ == "__main__":
     data = crawl_exhibitions()
 
