@@ -59,7 +59,7 @@ def save_exhibitions(conn_info, exhibitions: Iterable[Dict[str, Any]]) -> int:
         cur = conn.cursor()
 
         for ex in exhibitions:
-            # ✅ 1) description 비어있으면 스킵
+            # 1) description 비어있으면 스킵
             if is_empty_description(ex.get("description")):
                 print(f"[DB] description 비어있음 → 스킵: {ex.get('title')}")
                 continue
