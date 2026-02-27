@@ -6,9 +6,7 @@ from datetime import datetime, date, time
 import os
 import psycopg2
 
-# ==============================
 # 기본 설정
-# ==============================
 
 # 크롤링할 단일 페이지 URL
 TARGET_URL = "https://seoulnoin.or.kr/senior/space2.asp"
@@ -18,9 +16,7 @@ GALLERY_ADDRESS = "서울시 종로구 삼일대로 467 서울노인복지센터
 DEFAULT_OPEN_TIME_STR = "10:00"
 DEFAULT_CLOSE_TIME_STR = "18:00"
 
-# ==============================
 # 유틸리티 함수
-# ==============================
 
 def parse_date_range(text: str):
     """
@@ -65,9 +61,7 @@ def to_date_or_none(s):
         return None
 
 
-# ==============================
 # 크롤러 본체
-# ==============================
 
 def crawl_seoulnoin_single_page():
     with sync_playwright() as p:
@@ -86,9 +80,7 @@ def crawl_seoulnoin_single_page():
             print(f"[에러] 페이지 접속 실패: {e}")
             return []
 
-        # ---------------------------------------------------------
         # 1. 제목 파싱
-        # ---------------------------------------------------------
         title_el = page.locator("p.fs30.bold.black")
         title = ""
         if title_el.count():
@@ -96,9 +88,7 @@ def crawl_seoulnoin_single_page():
         else:
             print("  [경고] 제목 태그(p.fs30.bold.black) 미발견")
 
-        # ---------------------------------------------------------
         # 2. 날짜 파싱
-        # ---------------------------------------------------------
         date_el = page.locator(".smInfo1 li.point")
         start_date, end_date = None, None
         if date_el.count():
@@ -107,10 +97,8 @@ def crawl_seoulnoin_single_page():
         else:
             print("  [경고] 날짜 태그(.smInfo1 li.point) 미발견")
 
-        # ---------------------------------------------------------
         # 3. 설명(Description) 파싱
         # <div class="first_title">전시요약</div> 의 "다음 다음 div"
-        # ---------------------------------------------------------
         description = ""
 
         summary_title = page.locator("div.first_title", has_text="전시요약")
@@ -130,9 +118,7 @@ def crawl_seoulnoin_single_page():
         else:
             print("  [경고] '전시요약' 타이틀을 찾지 못했습니다.")
 
-        # ---------------------------------------------------------
         # 4. 이미지 파싱
-        # ---------------------------------------------------------
         img_urls = []
 
         target_img = page.locator("img[alt='전시이미지']")
@@ -148,9 +134,7 @@ def crawl_seoulnoin_single_page():
 
         img_urls = list(dict.fromkeys(img_urls))
 
-        # ---------------------------------------------------------
         # 5. 결과 출력 및 데이터 생성
-        # ---------------------------------------------------------
         print(f"  -> 제목: {title}")
         print(f"  -> 날짜: {start_date} ~ {end_date}")
         print(f"  -> 이미지: {len(img_urls)}개")
@@ -179,9 +163,7 @@ def crawl_seoulnoin_single_page():
             return []
 
 
-# ==============================
 # DB 저장 함수
-# ==============================
 
 def save_to_postgres(exhibitions):
     db_user = os.getenv("POSTGRES_USER", "pbl")
@@ -209,7 +191,7 @@ def save_to_postgres(exhibitions):
         skipped_count = 0
 
         for ex in exhibitions:
-            # ✅ description 비어있으면 저장하지 않음
+            # description 비어있으면 저장하지 않음
             desc = (ex.get("description") or "").strip()
             if not desc:
                 print(f"[DB] description 없음, 스킵: {ex.get('title')}")
@@ -221,7 +203,7 @@ def save_to_postgres(exhibitions):
 
             cur.execute(insert_sql, (
                 ex.get("title"),
-                desc,  # ✅ 정리된 description 저장
+                desc,  # 정리된 description 저장
                 ex.get("address"),
                 ex.get("author"),
                 s_dt, e_dt,
@@ -244,10 +226,7 @@ def save_to_postgres(exhibitions):
         if conn:
             conn.close()
 
-
-# ==============================
 # 실행부
-# ==============================
 if __name__ == "__main__":
     data = crawl_seoulnoin_single_page()
 
