@@ -5,10 +5,9 @@ from urllib.parse import urljoin
 from datetime import datetime, date
 from playwright.sync_api import sync_playwright
 import os
-import psycopg2  # PostgreSQL 연동용
+import psycopg2  
 
 # 1. 갤러리은 리스트 페이지 (전시 목록이 있는 게시판/메인)
-# 만약 메인 페이지에 슬라이더가 있다면 "https://galleryeun.com/index.php" 사용
 LIST_URL = "https://galleryeun.com/index.php?module=Board&action=SiteBoard&sMode=SELECT_FORM&iBrdNo=1"
 
 
@@ -154,19 +153,13 @@ def normalize_text(s: str) -> str:
         return ""
     return s.strip()
 
-
-# ==============================
 # 크롤러 본체
-# ==============================
-
 def crawl_exhibitions():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
-        # =================================================================
         # [1단계] 리스트 페이지 크롤링 (슬라이더 수집)
-        # =================================================================
         print(">>> [1단계] 리스트 페이지 접속 중...")
         try:
             page.goto(LIST_URL, timeout=60_000)
@@ -176,7 +169,7 @@ def crawl_exhibitions():
             try:
                 page.wait_for_selector(".slick-list .slick-slide", timeout=5000)
             except:
-                print("⚠️ 슬라이더를 찾을 수 없습니다. URL을 확인해주세요.")
+                print("슬라이더를 찾을 수 없습니다. URL을 확인해주세요.")
                 browser.close()
                 return []
 
@@ -187,7 +180,7 @@ def crawl_exhibitions():
 
         exhibitions = []
 
-        # 가짜(cloned) 슬라이드 제외하고 진짜만 선택
+        # 가짜(cloned) 슬라이드 제외. 진짜만 선택
         slides = page.locator(".slick-list .slick-slide:not(.slick-cloned)")
         count = slides.count()
         print(f"[리스트] 발견된 원본 전시 개수: {count}")
@@ -240,13 +233,13 @@ def crawl_exhibitions():
             exhibitions.append({
                 "title": title_kr,
                 "subtitle": subtitle,
-                "operatingDay": operating_day,           # raw (지금은 안 씀)
-                "start_date": start_date,               # 파싱 후
+                "operatingDay": operating_day,           
+                "start_date": start_date,               
                 "end_date": end_date,
                 "detailUrl": detail_url,
                 "galleryName": "갤러리은",
-                "operatingHour": operating_hour,        # raw (지금은 안 씀)
-                "open_time": open_time,                 # 'HH:MM'
+                "operatingHour": operating_hour,        
+                "open_time": open_time,                 
                 "close_time": close_time,
                 "imageUrl": [thumb_url] if thumb_url else [],
                 # 상세 페이지에서 채울 값들
@@ -258,9 +251,7 @@ def crawl_exhibitions():
 
         print(f"[리스트] 총 {len(exhibitions)}개 리스트 확보 완료.\n")
 
-        # =================================================================
         # [2단계] 상세 페이지 크롤링
-        # =================================================================
         for idx, ex in enumerate(exhibitions):
             url = ex["detailUrl"]
             print(f"[{idx + 1}/{len(exhibitions)}] 상세 이동: {ex['title']}")
@@ -277,9 +268,7 @@ def crawl_exhibitions():
                 print(f"  -> [오류] 상세 페이지 접속 실패: {e}")
                 continue
 
-            # ---------------------------------------------------------
             # (1) 이미지 수집 (style 속성의 url 추출)
-            # ---------------------------------------------------------
             detail_images = ex["imageUrl"][:]  # 썸네일 포함
 
             # A. 상단 대표 이미지 (.ex_li .img_dummy)
@@ -304,9 +293,7 @@ def crawl_exhibitions():
             ex["imageUrl"] = list(dict.fromkeys(detail_images))
             print(f"  -> 이미지: {len(ex['imageUrl'])}개 수집")
 
-            # ---------------------------------------------------------
             # (2) 작가 이름 후보: 작품 리스트 <a class="gallery"> 블록
-            # ---------------------------------------------------------
             artist_list: list[str] = []
 
             def add_artist_name(name: str):
@@ -329,9 +316,7 @@ def crawl_exhibitions():
                     first_part = p_text.split(",")[0].strip()
                     add_artist_name(first_part)
 
-            # ---------------------------------------------------------
             # (3) 텍스트 수집 및 분리 (서문 vs 프로필, 참여 작가)
-            # ---------------------------------------------------------
             text_container = page.locator(".t_st2").first
 
             description = ""
@@ -403,11 +388,7 @@ def crawl_exhibitions():
 
         return exhibitions
 
-
-# ==============================
 # DB 저장 함수
-# ==============================
-
 def save_to_postgres(exhibitions):
     """
     exhibition 테이블 구조 (다른 크롤러와 동일 가정)
@@ -461,7 +442,7 @@ def save_to_postgres(exhibitions):
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
                 continue
 
-            # ✅ description이 한 글자도 없으면(공백 포함) 스킵
+            # description이 한 글자도 없으면(공백 포함) 스킵
             desc = normalize_text(ex.get("description") or "")
             if not desc:
                 skipped_no_description += 1
@@ -503,10 +484,7 @@ def save_to_postgres(exhibitions):
         if conn:
             conn.close()
 
-
-# ==============================
 # 메인 실행부
-# ==============================
 
 if __name__ == "__main__":
     data = crawl_exhibitions()
