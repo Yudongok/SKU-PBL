@@ -4,22 +4,12 @@ import json
 import re
 from datetime import datetime, date, time
 import os
-
-import psycopg2  # PostgreSQL 연동용
-
-
-# ==============================
-# 기본 설정
-# ==============================
+import psycopg2  
 
 # 올미아트스페이스 현재 전시 URL
 LIST_URL = "http://www.allmeartspace.com/b/exhibitions/?state=current"
 
-
-# ==============================
 # 날짜/시간 파싱 유틸 함수들
-# ==============================
-
 def parse_single_date(part, base_date=None):
     """
     part: '2025. 11. 26', '2025.12.3', '12.8', '8', '2025-08-25' 같은 문자열
@@ -179,10 +169,7 @@ def normalize_text(s: str) -> str:
     return s.strip()
 
 
-# ==============================
 # 크롤러 본체 (올미아트스페이스)
-# ==============================
-
 def crawl_exhibitions():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -382,11 +369,7 @@ def crawl_exhibitions():
         print(f"\n[최종] 올미 전시 {len(exhibitions)}개 상세 정보 수집 완료")
         return exhibitions
 
-
-# ==============================
 # DB 저장 함수
-# ==============================
-
 def save_to_postgres(exhibitions):
     """
     exhibition 테이블 구조(인사아트/프리마와 동일 가정):
@@ -440,7 +423,7 @@ def save_to_postgres(exhibitions):
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
                 continue
 
-            # ✅ description이 한 글자도 없으면 스킵
+            # description이 한 글자도 없으면 스킵
             desc = normalize_text(ex.get("description") or "")
             if not desc:
                 skipped_no_description += 1
@@ -483,10 +466,7 @@ def save_to_postgres(exhibitions):
             conn.close()
 
 
-# ==============================
 # 메인 실행부
-# ==============================
-
 if __name__ == "__main__":
     data = crawl_exhibitions()
 
