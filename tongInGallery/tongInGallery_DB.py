@@ -7,14 +7,12 @@ from datetime import datetime, date, time as dt_time
 import time
 import os
 
-import psycopg2  # PostgreSQL 연동용
+import psycopg2
 
 BASE_URL = "http://tongingallery.com/exhibitions"
 
 
-# ==============================
 # 유틸 함수
-# ==============================
 
 def parse_single_date(part: str, base_date: datetime | None = None) -> datetime | None:
     if not part:
@@ -97,9 +95,7 @@ def to_time_or_none(s: str):
         return None
 
 
-# ==============================
 # 크롤러 본체
-# ==============================
 
 def crawl_exhibitions():
     with sync_playwright() as p:
@@ -123,9 +119,7 @@ def crawl_exhibitions():
 
         exhibitions = []
 
-        # -----------------------------
         # 1. ON VIEW 목록 수집
-        # -----------------------------
         onview_header = page.locator("h6", has_text="ON VIEW").first
         if onview_header.count():
             header_row = onview_header.locator(
@@ -182,9 +176,7 @@ def crawl_exhibitions():
                     }
                 )
 
-        # -----------------------------
         # 1-2. UPCOMING 목록 수집
-        # -----------------------------
         upcoming_header = page.locator("h6", has_text="UPCOMING").first
         if upcoming_header.count():
             inside = upcoming_header.locator(
@@ -239,22 +231,20 @@ def crawl_exhibitions():
 
         print(f"\n[리스트 완료] 총 {len(exhibitions)}개 수집됨.\n")
 
-        # -----------------------------
         # 2. 상세 페이지 순회
-        # -----------------------------
         for ex in exhibitions:
             url = ex.get("detail_url")
             if not url:
                 continue
 
-            print(f"👉 이동: {ex['title']} -> {url}")
+            print(f"이동: {ex['title']} -> {url}")
             try:
                 page.goto(url, timeout=60_000)
                 page.keyboard.press("End")
                 page.wait_for_load_state("networkidle")
                 time.sleep(1)
             except Exception as e:
-                print(f"   ❌ 로딩 에러: {e}")
+                print(f"   로딩 에러: {e}")
                 continue
 
             ex["author"] = ""
@@ -298,9 +288,9 @@ def crawl_exhibitions():
             ex["description"] = description
 
             if description:
-                print(f"   ✅ 최종 설명: {description[:30].replace('\n', ' ')}...")
+                print(f"   최종 설명: {description[:30].replace('\n', ' ')}...")
             else:
-                print("   ⚠️ 설명을 찾지 못했습니다.")
+                print("   설명을 찾지 못했습니다.")
 
             gallery_images = page.evaluate(
                 """() => {
@@ -337,9 +327,7 @@ def crawl_exhibitions():
         return exhibitions
 
 
-# ==============================
 # DB 저장 함수
-# ==============================
 
 def save_to_postgres(exhibitions):
     """
@@ -391,7 +379,7 @@ def save_to_postgres(exhibitions):
                 skipped += 1
                 continue
 
-            # ✅ description 비어있으면 저장하지 않음
+            # description 비어있으면 저장하지 않음
             desc = (ex.get("description") or "").strip()
             if not desc:
                 print(f"[DB] description 없음, 스킵: {ex.get('title')}")
@@ -405,7 +393,7 @@ def save_to_postgres(exhibitions):
                 insert_sql,
                 (
                     ex.get("title") or "",
-                    desc,  # ✅ 정제된 description 저장
+                    desc,  # 정제된 description 저장
                     ex.get("address"),
                     ex.get("author") or "",
                     start_dt,
@@ -434,9 +422,7 @@ def save_to_postgres(exhibitions):
             conn.close()
 
 
-# ==============================
 # 메인 실행부
-# ==============================
 
 if __name__ == "__main__":
     data = crawl_exhibitions()
