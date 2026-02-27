@@ -6,11 +6,9 @@ import json
 import os
 import re
 from datetime import datetime, date
-import psycopg2  # PostgreSQL 연동용
+import psycopg2  
 
-# ------------------------
 # 기본 설정
-# ------------------------
 
 # .env 파일에서 환경변수 로드
 load_dotenv()
@@ -22,9 +20,7 @@ LIST_URL = "https://www.insa1010.com/28"
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
-# ------------------------
-# 공백 제거 유틸 (✅ 추가)
-# ------------------------
+# 공백 제거 유틸 
 def normalize_text(s: str) -> str:
     """None 또는 공백만 있는 텍스트를 빈 문자열로 정리"""
     if not s:
@@ -32,10 +28,7 @@ def normalize_text(s: str) -> str:
     return s.strip()
 
 
-# ------------------------
 # 날짜/시간 파싱 유틸 함수들
-# ------------------------
-
 def parse_single_date(part: str, base_date: datetime | None = None) -> datetime | None:
     """
     part 예시:
@@ -187,10 +180,7 @@ def to_time_or_none(s: str):
         return None
 
 
-# ------------------------
 # GPT로 필드 추출하는 함수
-# ------------------------
-
 def extract_fields_with_gpt(description_text: str, image_urls: list[str]) -> dict:
     system_prompt = """
 당신은 전시 정보 정리 도우미입니다.
@@ -257,10 +247,7 @@ def extract_fields_with_gpt(description_text: str, image_urls: list[str]) -> dic
     return data
 
 
-# ------------------------
 # 크롤러 함수
-# ------------------------
-
 def crawl_exhibitions():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -356,9 +343,7 @@ def crawl_exhibitions():
         return exhibitions
 
 
-# ------------------------
 # DB 저장 함수
-# ------------------------
 
 def save_to_postgres(exhibitions):
     db_user = os.getenv("POSTGRES_USER", "pbl")
@@ -404,7 +389,7 @@ def save_to_postgres(exhibitions):
                 print(f"[DB] end_date 없음, 스킵: {ex.get('title')}")
                 continue
 
-            # ✅ description이 비어있으면 스킵 (핵심 변경)
+            # description이 비어있으면 스킵 (핵심 변경)
             desc = normalize_text(ex.get("description") or "")
             if not desc:
                 print(f"[DB] description 없음, 스킵: {ex.get('title')}")
@@ -417,7 +402,7 @@ def save_to_postgres(exhibitions):
                 insert_sql,
                 (
                     ex.get("title") or "",
-                    desc,  # ✅ desc 사용
+                    desc,  # desc 사용
                     ex.get("address"),
                     ex.get("author") or "",
                     start_dt,
@@ -445,9 +430,7 @@ def save_to_postgres(exhibitions):
             conn.close()
 
 
-# ------------------------
 # 메인 실행부
-# ------------------------
 
 if __name__ == "__main__":
     data = crawl_exhibitions()
