@@ -4,26 +4,19 @@ import json
 import re
 from datetime import datetime, date, time
 import os
+import psycopg2 
 
-import psycopg2  # PostgreSQL 연동용
-
-
-# ==============================
 # 기본 설정
-# ==============================
-
 LIST_URL = "https://rhogallery.com/ko/current/"
 GALLERY_NAME = "노화랑"
-BASE_ADDRESS = "서울 종로구 인사동길 54 노화랑"  # 필요하면 수정
+BASE_ADDRESS = "서울 종로구 인사동길 54 노화랑" 
 
 # open_time / close_time 없을 때 기본값
 DEFAULT_OPEN_TIME = time(10, 0)   # 10:00
 DEFAULT_CLOSE_TIME = time(18, 0)  # 18:00
 
 
-# ==============================
 # 날짜/시간 파싱 유틸 함수들
-# ==============================
 
 def parse_single_date(part, base_date=None):
     """
@@ -158,10 +151,7 @@ def to_time_or_none(s: str):
     except ValueError:
         return None
 
-
-# ==============================
 # 크롤러 본체 (RHO GALLERY)
-# ==============================
 
 def crawl_exhibitions():
     with sync_playwright() as p:
@@ -339,9 +329,7 @@ def crawl_exhibitions():
         return exhibitions
 
 
-# ==============================
 # DB 저장 함수
-# ==============================
 
 def save_to_postgres(exhibitions):
     """
@@ -386,7 +374,7 @@ def save_to_postgres(exhibitions):
             start_dt = to_date_or_none(ex.get("start_date"))
             end_dt = to_date_or_none(ex.get("end_date"))
 
-            # ✅ description 비어있으면 INSERT 스킵
+            # description 비어있으면 INSERT 스킵
             desc = (ex.get("description") or "").strip()
             if not desc:
                 print(f"[DB] description 없음, 스킵: {ex.get('title')}")
@@ -404,7 +392,7 @@ def save_to_postgres(exhibitions):
                 insert_sql,
                 (
                     ex.get("title") or "",
-                    desc,  # ✅ 정리된 description 사용
+                    desc,  # 정리된 description 사용
                     ex.get("address"),
                     ex.get("author") or "",
                     start_dt,
@@ -432,9 +420,7 @@ def save_to_postgres(exhibitions):
             conn.close()
 
 
-# ==============================
 # 메인 실행부
-# ==============================
 
 if __name__ == "__main__":
     data = crawl_exhibitions()
