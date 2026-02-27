@@ -5,25 +5,19 @@ import json
 import re
 from datetime import datetime, date
 import os
-import psycopg2  # ✅ DB 저장 추가
+import psycopg2 
 
 # 마루아트센터 현재 전시 URL
 LIST_URL = "https://maruartcenter.co.kr/default/exhibit/exhibit01.php?sub=01"
 
-
-# ==============================
-# 공백 제거 유틸 (✅ 추가)
-# ==============================
+# 공백 제거 유틸 
 def normalize_text(s: str) -> str:
     """None 또는 공백만 있는 텍스트를 빈 문자열로 정리"""
     if not s:
         return ""
     return s.strip()
 
-
-# ==============================
-# 날짜 변환 유틸 (✅ DB용 추가)
-# ==============================
+# 날짜 변환 유틸 
 def to_date_or_none(s: str):
     """'YYYY-MM-DD' -> date 객체, 실패 시 None"""
     if not s:
@@ -56,9 +50,7 @@ def to_time_or_none(s: str):
         return None
 
 
-# ==============================
 # 날짜/시간 파싱 유틸 함수들
-# ==============================
 
 def parse_single_date(part: str, base_date: datetime | None = None) -> datetime | None:
     """
@@ -147,9 +139,7 @@ def parse_operating_hour(operating_hour: str):
     return open_time, close_time
 
 
-# ==============================
 # 크롤러
-# ==============================
 
 def crawl_exhibitions():
     with sync_playwright() as p:
@@ -281,10 +271,7 @@ def crawl_exhibitions():
 
         return exhibitions
 
-
-# ==============================
-# ✅ DB 저장 함수 추가
-# ==============================
+# DB 저장 함수 추가
 
 def save_to_postgres(exhibitions):
     """
@@ -326,7 +313,7 @@ def save_to_postgres(exhibitions):
         today = date.today()
 
         for ex in exhibitions:
-            # ✅ description 비어있으면 스킵
+            # description 비어있으면 스킵
             desc = normalize_text(ex.get("description") or "")
             if not desc:
                 print(f"[DB] description 없음, 스킵: {ex.get('title')}")
@@ -374,10 +361,7 @@ def save_to_postgres(exhibitions):
         if conn:
             conn.close()
 
-
-# ==============================
 # 메인 실행부
-# ==============================
 
 if __name__ == "__main__":
     data = crawl_exhibitions()
@@ -391,7 +375,7 @@ if __name__ == "__main__":
         print(f"파일 위치: {output_path}")
         print(f"총 데이터 개수: {len(data)}")
 
-        # ✅ DB 저장 실행
+        # DB 저장 실행
         save_to_postgres(data)
 
     else:
